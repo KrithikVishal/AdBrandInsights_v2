@@ -4,11 +4,13 @@ import { queryClient } from "@/lib/queryClient";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { Toaster } from "@/components/ui/toaster";
 import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
 
 // Components
 import { Sidebar } from "@/components/sidebar";
 import { FloatingActionButton } from "@/components/floating-action-button";
 import { ToastContainer, useToastManager } from "@/components/toast-notifications";
+import { LoadingScreen } from "@/components/loading-screen";
 
 // Pages
 import Overview from "@/pages/overview";
@@ -22,6 +24,7 @@ import NotFound from "@/pages/not-found";
 
 function AppContent() {
   const { toasts, dismissToast, showSuccess, showInfo } = useToastManager();
+  const [showLoading, setShowLoading] = useState(true);
 
   const handleExportPDF = () => {
     showSuccess("PDF Export", "Your report has been exported successfully.");
@@ -39,8 +42,17 @@ function AppContent() {
     showInfo("Create Report", "Report creation wizard coming soon!");
   };
 
+  if (showLoading) {
+    return <LoadingScreen onComplete={() => setShowLoading(false)} />;
+  }
+
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ duration: 0.5 }}
+      className="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900"
+    >
       <Sidebar />
       
       <main className="flex-1 overflow-auto">
@@ -68,7 +80,7 @@ function AppContent() {
       
       <ToastContainer toasts={toasts} onDismiss={dismissToast} />
       <Toaster />
-    </div>
+    </motion.div>
   );
 }
 

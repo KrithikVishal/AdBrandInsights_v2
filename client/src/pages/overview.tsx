@@ -134,7 +134,7 @@ export default function Overview() {
 
   return (
     <motion.div 
-      className="p-6 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen"
+      className="p-6 space-y-8 bg-transparent min-h-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}

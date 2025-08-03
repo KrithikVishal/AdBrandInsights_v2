@@ -184,15 +184,15 @@ export default function Campaigns() {
 
   const filteredCampaigns = campaigns?.filter(campaign => {
     const matchesSearch = campaign.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPlatform = !selectedPlatform || campaign.platform === selectedPlatform;
-    const matchesStatus = !selectedStatus || campaign.status === selectedStatus;
+    const matchesPlatform = !selectedPlatform || selectedPlatform === "all" || campaign.platform === selectedPlatform;
+    const matchesStatus = !selectedStatus || selectedStatus === "all" || campaign.status === selectedStatus;
     return matchesSearch && matchesPlatform && matchesStatus;
   });
 
   if (isLoading) {
     return (
       <motion.div 
-        className="p-6 space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen"
+        className="p-6 space-y-6 bg-transparent min-h-screen"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -213,7 +213,7 @@ export default function Campaigns() {
 
   return (
     <motion.div 
-      className="p-6 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen"
+      className="p-6 space-y-8 bg-transparent min-h-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
@@ -312,7 +312,7 @@ export default function Campaigns() {
             <SelectValue placeholder="All Platforms" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Platforms</SelectItem>
+            <SelectItem value="all">All Platforms</SelectItem>
             <SelectItem value="Google Ads">Google Ads</SelectItem>
             <SelectItem value="Facebook">Facebook</SelectItem>
             <SelectItem value="LinkedIn">LinkedIn</SelectItem>
@@ -326,7 +326,7 @@ export default function Campaigns() {
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="all">All Status</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="paused">Paused</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
