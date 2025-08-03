@@ -156,6 +156,7 @@ export class MemStorage implements IStorage {
     const user: User = { 
       ...insertUser, 
       id,
+      role: insertUser.role || "user",
       createdAt: new Date(),
     };
     this.users.set(id, user);
@@ -176,6 +177,7 @@ export class MemStorage implements IStorage {
     const campaign: Campaign = {
       ...insertCampaign,
       id,
+      status: insertCampaign.status || "draft",
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -214,6 +216,7 @@ export class MemStorage implements IStorage {
     const metrics: Metrics = {
       ...insertMetrics,
       id,
+      campaignId: insertMetrics.campaignId || null,
     };
     this.metrics.set(id, metrics);
     return metrics;
@@ -239,6 +242,7 @@ export class MemStorage implements IStorage {
     const audience: Audience = {
       ...insertAudience,
       id,
+      size: insertAudience.size || null,
       createdAt: new Date(),
     };
     this.audiences.set(id, audience);
@@ -279,6 +283,9 @@ export class MemStorage implements IStorage {
     const creative: Creative = {
       ...insertCreative,
       id,
+      format: insertCreative.format || null,
+      description: insertCreative.description || null,
+      status: insertCreative.status || null,
       createdAt: new Date(),
     };
     this.creatives.set(id, creative);
@@ -315,6 +322,7 @@ export class MemStorage implements IStorage {
     const event: ConversionEvent = {
       ...insertEvent,
       id,
+      campaignId: insertEvent.campaignId || null,
       timestamp: new Date(),
     };
     this.conversionEvents.set(id, event);
@@ -335,6 +343,7 @@ export class MemStorage implements IStorage {
     const report: Report = {
       ...insertReport,
       id,
+      schedule: insertReport.schedule || null,
       createdAt: new Date(),
       lastRun: null,
       nextRun: null,

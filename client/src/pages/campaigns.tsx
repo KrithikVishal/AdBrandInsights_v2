@@ -1,116 +1,55 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Search, Filter, MoreVertical, Edit, Eye } from "lucide-react";
+import { Plus, Search, Filter, Zap, BarChart3 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertCampaignSchema, type Campaign, type InsertCampaign } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
-import { formatCurrency } from "@/lib/metrics";
+import { CampaignCard } from "@/components/campaign-card";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { ChartCard } from "@/components/chart-card";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { faker } from "@faker-js/faker";
 
-function CampaignCard({ campaign }: { campaign: Campaign }) {
-  const budgetUsed = campaign.budget && campaign.spent 
-    ? (parseFloat(campaign.spent) / parseFloat(campaign.budget)) * 100 
-    : 0;
+// Generate performance timeline data
+const generateTimelineData = () => {
+  return Array.from({ length: 7 }, (_, i) => ({
+    date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    impressions: faker.number.int({ min: 10000, max: 50000 }),
+    clicks: faker.number.int({ min: 500, max: 2500 }),
+    conversions: faker.number.int({ min: 25, max: 150 })
+  }));
+};
 
-  const roas = campaign.spent && parseFloat(campaign.spent) > 0 
-    ? (Math.random() * 3 + 2).toFixed(1) // Simulated ROAS
-    : "0.0";
-
-  return (
-    <Card className="hover:shadow-lg transition-shadow">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h3 className="font-semibold text-lg mb-1">{campaign.name}</h3>
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-              <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-200">
-                {campaign.platform}
-              </Badge>
-              <Badge 
-                variant={campaign.status === "active" ? "default" : "secondary"}
-                className={campaign.status === "active" ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}
-              >
-                {campaign.status}
-              </Badge>
-            </div>
-          </div>
-          <Button variant="ghost" size="icon">
-            <MoreVertical className="w-4 h-4" />
-          </Button>
-        </div>
-        
-        <div className="space-y-3 mb-4">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Budget:</span>
-            <span className="font-mono font-medium">{formatCurrency(campaign.budget || "0")}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Spent:</span>
-            <span className="font-mono font-medium">{formatCurrency(campaign.spent || "0")}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">ROAS:</span>
-            <span className="font-mono font-medium text-green-600">{roas}x</span>
-          </div>
-        </div>
-        
-        <div className="w-full bg-muted rounded-full h-2 mb-4">
-          <div 
-            className="bg-primary h-2 rounded-full transition-all" 
-            style={{ width: `${Math.min(budgetUsed, 100)}%` }}
-          />
-        </div>
-        
-        <div className="flex space-x-2">
-          <Button className="flex-1" size="sm">
-            <Edit className="w-4 h-4 mr-2" />
-            Edit
-          </Button>
-          <Button variant="outline" className="flex-1" size="sm">
-            <Eye className="w-4 h-4 mr-2" />
-            View Details
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function CreateCampaignDialog() {
-  const [open, setOpen] = useState(false);
+function CreateCampaignDialog({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
+  
   const form = useForm<InsertCampaign>({
     resolver: zodResolver(insertCampaignSchema),
     defaultValues: {
       name: "",
       platform: "",
-      status: "draft",
-      budget: "0",
+      budget: "",
       objective: "",
-    },
+      status: "draft"
+    }
   });
 
   const createCampaignMutation = useMutation({
-    mutationFn: async (data: InsertCampaign) => {
-      const response = await apiRequest("POST", "/api/campaigns", data);
-      return response.json();
-    },
+    mutationFn: (data: InsertCampaign) => apiRequest("/api/campaigns", "POST", data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/campaigns"] });
       toast({
         title: "Campaign created",
-        description: "Your campaign has been created successfully.",
+        description: "Your new campaign has been created successfully.",
       });
       setOpen(false);
       form.reset();
@@ -121,7 +60,7 @@ function CreateCampaignDialog() {
         description: "Failed to create campaign. Please try again.",
         variant: "destructive",
       });
-    },
+    }
   });
 
   const onSubmit = (data: InsertCampaign) => {
@@ -130,15 +69,12 @@ function CreateCampaignDialog() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button>
-          <Plus className="w-4 h-4 mr-2" />
-          Create Campaign
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create New Campaign</DialogTitle>
+          <DialogTitle className="flex items-center space-x-2">
+            <Zap className="h-5 w-5 text-blue-600" />
+            <span>Create New Campaign</span>
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -162,7 +98,7 @@ function CreateCampaignDialog() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Platform</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select platform" />
@@ -188,7 +124,7 @@ function CreateCampaignDialog() {
                 <FormItem>
                   <FormLabel>Budget</FormLabel>
                   <FormControl>
-                    <Input type="number" placeholder="0.00" {...field} />
+                    <Input type="number" placeholder="0.00" {...field} value={field.value || ""} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -201,7 +137,7 @@ function CreateCampaignDialog() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Objective</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue={field.value || ""}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select objective" />
@@ -219,7 +155,7 @@ function CreateCampaignDialog() {
               )}
             />
             
-            <div className="flex justify-end space-x-2">
+            <div className="flex justify-end space-x-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
@@ -236,128 +172,221 @@ function CreateCampaignDialog() {
 
 export default function Campaigns() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [platformFilter, setPlatformFilter] = useState("all");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedPlatform, setSelectedPlatform] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
 
   const { data: campaigns, isLoading } = useQuery<Campaign[]>({
-    queryKey: ["/api/campaigns"],
+    queryKey: ["/api/campaigns"]
   });
+
+  const timelineData = generateTimelineData();
 
   const filteredCampaigns = campaigns?.filter(campaign => {
     const matchesSearch = campaign.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesPlatform = platformFilter === "all" || campaign.platform === platformFilter;
-    const matchesStatus = statusFilter === "all" || campaign.status === statusFilter;
-    
+    const matchesPlatform = !selectedPlatform || campaign.platform === selectedPlatform;
+    const matchesStatus = !selectedStatus || campaign.status === selectedStatus;
     return matchesSearch && matchesPlatform && matchesStatus;
-  }) || [];
+  });
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <Skeleton className="h-8 w-48 mb-2" />
-            <Skeleton className="h-4 w-96" />
-          </div>
-          <Skeleton className="h-10 w-32" />
+      <motion.div 
+        className="p-6 space-y-6 bg-gray-50 dark:bg-gray-900 min-h-screen"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="flex justify-between items-center">
+          <LoadingSkeleton variant="text" className="h-8 w-48" />
+          <LoadingSkeleton variant="text" className="h-10 w-32" />
         </div>
-        
-        <Card>
-          <CardContent className="p-4">
-            <Skeleton className="h-10 w-full" />
-          </CardContent>
-        </Card>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+        <LoadingSkeleton variant="chart" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <Skeleton className="h-32 w-full" />
-              </CardContent>
-            </Card>
+            <LoadingSkeleton key={i} variant="card" className="h-64" />
           ))}
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <motion.div 
+      className="p-6 space-y-8 bg-gray-50 dark:bg-gray-900 min-h-screen"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0"
+      >
         <div>
-          <h2 className="text-2xl font-semibold">Campaign Management</h2>
-          <p className="text-muted-foreground">Create, manage, and optimize your advertising campaigns</p>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Campaign Management
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Monitor and optimize your advertising campaigns across all platforms
+          </p>
         </div>
-        <CreateCampaignDialog />
-      </div>
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Button onClick={() => setCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Campaign
+          </Button>
+        </motion.div>
+      </motion.div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 min-w-64">
-              <div className="relative">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  placeholder="Search campaigns..."
-                  className="pl-10"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
-            </div>
-            
-            <Select value={platformFilter} onValueChange={setPlatformFilter}>
-              <SelectTrigger className="w-40">
-                <SelectValue placeholder="All Platforms" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Platforms</SelectItem>
-                <SelectItem value="Google Ads">Google Ads</SelectItem>
-                <SelectItem value="Facebook">Facebook</SelectItem>
-                <SelectItem value="LinkedIn">LinkedIn</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="paused">Paused</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            <Button variant="outline" size="icon">
-              <Filter className="w-4 h-4" />
-            </Button>
+      {/* Performance Timeline */}
+      <ChartCard title="Campaign Performance Timeline" index={0}>
+        <ResponsiveContainer width="100%" height={200}>
+          <LineChart data={timelineData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+            <XAxis 
+              dataKey="date" 
+              tick={{ fontSize: 12 }}
+              stroke="#6B7280"
+            />
+            <YAxis tick={{ fontSize: 12 }} stroke="#6B7280" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'white',
+                border: '1px solid #E5E7EB',
+                borderRadius: '8px',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+              }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="impressions" 
+              stroke="#3B82F6" 
+              strokeWidth={2}
+              dot={{ fill: '#3B82F6', strokeWidth: 2, r: 3 }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="clicks" 
+              stroke="#10B981" 
+              strokeWidth={2}
+              dot={{ fill: '#10B981', strokeWidth: 2, r: 3 }}
+            />
+            <Line 
+              type="monotone" 
+              dataKey="conversions" 
+              stroke="#F59E0B" 
+              strokeWidth={2}
+              dot={{ fill: '#F59E0B', strokeWidth: 2, r: 3 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
+      </ChartCard>
+
+      {/* Filters */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+      >
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search campaigns..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Campaign Grid */}
-      {filteredCampaigns.length === 0 ? (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <p className="text-muted-foreground text-lg">No campaigns found</p>
-            <p className="text-muted-foreground text-sm mt-2">
-              {campaigns?.length === 0 
-                ? "Create your first campaign to get started" 
-                : "Try adjusting your search or filters"
-              }
-            </p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-          {filteredCampaigns.map((campaign) => (
-            <CampaignCard key={campaign.id} campaign={campaign} />
-          ))}
         </div>
-      )}
-    </div>
+        <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+          <SelectTrigger className="w-[180px]">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="All Platforms" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Platforms</SelectItem>
+            <SelectItem value="Google Ads">Google Ads</SelectItem>
+            <SelectItem value="Facebook">Facebook</SelectItem>
+            <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+            <SelectItem value="Twitter">Twitter</SelectItem>
+            <SelectItem value="TikTok">TikTok</SelectItem>
+          </SelectContent>
+        </Select>
+        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+          <SelectTrigger className="w-[180px]">
+            <BarChart3 className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="paused">Paused</SelectItem>
+            <SelectItem value="draft">Draft</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
+      </motion.div>
+
+      {/* Campaigns Grid */}
+      <AnimatePresence mode="wait">
+        {filteredCampaigns && filteredCampaigns.length > 0 ? (
+          <motion.div
+            key="campaigns-grid"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {filteredCampaigns.map((campaign, index) => (
+              <CampaignCard
+                key={campaign.id}
+                campaign={campaign}
+                index={index}
+              />
+            ))}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="no-campaigns"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="text-center py-12"
+          >
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <BarChart3 className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No campaigns found
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">
+              {searchTerm || selectedPlatform || selectedStatus
+                ? "No campaigns match your current filters."
+                : "Get started by creating your first campaign."}
+            </p>
+            <Button
+              onClick={() => setCreateDialogOpen(true)}
+              variant="outline"
+              className="bg-white dark:bg-gray-800"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Create Your First Campaign
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <CreateCampaignDialog open={createDialogOpen} setOpen={setCreateDialogOpen} />
+    </motion.div>
   );
 }

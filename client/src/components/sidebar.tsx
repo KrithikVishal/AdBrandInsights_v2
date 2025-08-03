@@ -1,65 +1,246 @@
-import { TrendingUp, LayoutDashboard, Megaphone, Users, Image, Target, FileText, Settings, User } from "lucide-react";
-import { useLocation } from "wouter";
+import { motion, AnimatePresence } from "framer-motion";
+import { Link, useLocation } from "wouter";
+import { 
+  LayoutDashboard, 
+  Target, 
+  Users, 
+  Image, 
+  TrendingUp, 
+  FileText, 
+  Settings, 
+  Moon, 
+  Sun,
+  Menu,
+  X,
+  Brain
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useTheme } from "@/hooks/use-theme";
+import { useState } from "react";
 
-const navigationItems = [
-  { id: "overview", label: "Overview", icon: LayoutDashboard, path: "/dashboard/overview" },
-  { id: "campaigns", label: "Campaign Management", icon: Megaphone, path: "/dashboard/campaigns" },
-  { id: "audience", label: "Audience Analytics", icon: Users, path: "/dashboard/audience" },
-  { id: "creative", label: "Creative Performance", icon: Image, path: "/dashboard/creative" },
-  { id: "conversion", label: "Conversion Tracking", icon: Target, path: "/dashboard/conversion" },
-  { id: "reports", label: "Reports & Export", icon: FileText, path: "/dashboard/reports" },
-  { id: "settings", label: "Settings", icon: Settings, path: "/dashboard/settings" },
+const menuItems = [
+  { icon: LayoutDashboard, label: "Overview", path: "/" },
+  { icon: Target, label: "Campaigns", path: "/campaigns" },
+  { icon: Users, label: "Audience", path: "/audience" },
+  { icon: Image, label: "Creative", path: "/creative" },
+  { icon: TrendingUp, label: "Conversion", path: "/conversion" },
+  { icon: FileText, label: "Reports", path: "/reports" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
-interface SidebarProps {
-  onNavigate: (page: string) => void;
-  currentPage: string;
-}
+export function Sidebar() {
+  const [location] = useLocation();
+  const { theme, toggleTheme } = useTheme();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
-export default function Sidebar({ onNavigate, currentPage }: SidebarProps) {
-  const [, setLocation] = useLocation();
+  const sidebarVariants = {
+    expanded: {
+      width: 240,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    },
+    collapsed: {
+      width: 80,
+      transition: {
+        duration: 0.3,
+        ease: "easeInOut"
+      }
+    }
+  };
 
-  const handleNavigation = (item: typeof navigationItems[0]) => {
-    onNavigate(item.id);
-    setLocation(item.path);
+  const contentVariants = {
+    expanded: {
+      opacity: 1,
+      x: 0,
+      transition: {
+        delay: 0.1,
+        duration: 0.2
+      }
+    },
+    collapsed: {
+      opacity: 0,
+      x: -20,
+      transition: {
+        duration: 0.2
+      }
+    }
   };
 
   return (
-    <aside className="w-64 bg-card border-r border-border flex flex-col">
-      <div className="p-6 border-b border-border">
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="font-bold text-lg">ADmyBRAND</h1>
-            <p className="text-muted-foreground text-sm">Insights</p>
-          </div>
+    <motion.aside
+      variants={sidebarVariants}
+      animate={isCollapsed ? "collapsed" : "expanded"}
+      className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen sticky top-0 overflow-hidden"
+    >
+      {/* Header */}
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+        <div className="flex items-center justify-between">
+          <AnimatePresence>
+            {!isCollapsed && (
+              <motion.div
+                variants={contentVariants}
+                initial="collapsed"
+                animate="expanded"
+                exit="collapsed"
+                className="flex items-center space-x-2"
+              >
+                <motion.div
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.5 }}
+                  className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center"
+                >
+                  <Brain className="h-5 w-5 text-white" />
+                </motion.div>
+                <div>
+                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+                    ADmyBRAND
+                  </h1>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Insights
+                  </p>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="text-gray-600 dark:text-gray-300"
+            >
+              <motion.div
+                animate={{ rotate: isCollapsed ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                {isCollapsed ? <Menu className="h-4 w-4" /> : <X className="h-4 w-4" />}
+              </motion.div>
+            </Button>
+          </motion.div>
         </div>
       </div>
-      
+
+      {/* Navigation */}
       <nav className="flex-1 p-4 space-y-2">
-        {navigationItems.map((item) => {
+        {menuItems.map((item, index) => {
+          const isActive = location === item.path;
           const Icon = item.icon;
+
           return (
-            <button
-              key={item.id}
-              onClick={() => handleNavigation(item)}
-              className={`nav-item w-full ${currentPage === item.id ? 'active' : ''}`}
+            <motion.div
+              key={item.path}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
             >
-              <Icon className="w-5 h-5" />
-              <span>{item.label}</span>
-            </button>
+              <Link href={item.path}>
+                <motion.div
+                  whileHover={{ x: 4 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                    isActive
+                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-r-2 border-blue-600 dark:border-blue-400"
+                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                  }`}
+                >
+                  <motion.div
+                    whileHover={{ rotate: isActive ? 0 : 360 }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Icon className={`h-5 w-5 ${isCollapsed ? "mx-auto" : "mr-3"}`} />
+                  </motion.div>
+                  <AnimatePresence>
+                    {!isCollapsed && (
+                      <motion.span
+                        variants={contentVariants}
+                        initial="collapsed"
+                        animate="expanded"
+                        exit="collapsed"
+                        className="font-medium"
+                      >
+                        {item.label}
+                      </motion.span>
+                    )}
+                  </AnimatePresence>
+                  {isActive && !isCollapsed && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      className="ml-auto w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full"
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
+                </motion.div>
+              </Link>
+            </motion.div>
           );
         })}
       </nav>
-      
-      <div className="p-4 border-t border-border">
-        <button className="w-full flex items-center space-x-3 p-3 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors">
-          <User className="w-5 h-5" />
-          <span className="text-sm">John Smith</span>
-        </button>
+
+      {/* Theme Toggle */}
+      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Button
+            variant="ghost"
+            onClick={toggleTheme}
+            className={`w-full justify-start text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
+              isCollapsed ? "justify-center px-0" : ""
+            }`}
+          >
+            <motion.div
+              animate={{ rotate: theme === 'dark' ? 180 : 0 }}
+              transition={{ duration: 0.5 }}
+              className={isCollapsed ? "" : "mr-3"}
+            >
+              {theme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </motion.div>
+            <AnimatePresence>
+              {!isCollapsed && (
+                <motion.span
+                  variants={contentVariants}
+                  initial="collapsed"
+                  animate="expanded"
+                  exit="collapsed"
+                  className="font-medium"
+                >
+                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </Button>
+        </motion.div>
       </div>
-    </aside>
+
+      {/* Version Info */}
+      <AnimatePresence>
+        {!isCollapsed && (
+          <motion.div
+            variants={contentVariants}
+            initial="collapsed"
+            animate="expanded"
+            exit="collapsed"
+            className="p-4 text-center"
+          >
+            <div className="text-xs text-gray-400 dark:text-gray-500">
+              Version 2.1.0
+            </div>
+            <div className="text-xs text-gray-400 dark:text-gray-500">
+              AI-Powered Analytics
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.aside>
   );
 }
