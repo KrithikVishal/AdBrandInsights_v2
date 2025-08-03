@@ -1,0 +1,68 @@
+You're a senior React/Next.js developer and UI/UX designer. Help me build a modern, professional, and animation-rich analytics dashboard called "ADmyBRAND Insights" — an AI-powered platform for digital marketing agencies.
+
+🎯 Core Dashboard Requirements:
+1. **Overview Page** with:
+   - 4 animated metric cards (Revenue, Users, Conversions, Growth %)
+   - 3 interactive charts: Line, Bar, and Donut (use Chart.js, Recharts, or Nivo)
+   - Responsive data table with sorting, filtering, and pagination
+   - Smooth animations using Framer Motion (card entrance, hover effects, loading states)
+   - Real-time simulated updates using setInterval
+   - Beautiful dark/light mode toggle with animated transitions
+
+🎨 UI/UX Expectations:
+- Use a modern UI library like shadcn/ui or Chakra UI + Tailwind CSS
+- Consistent design system (spacing, typography, color scheme)
+- Mobile-first responsive layout with breakpoints
+- Clean visual hierarchy with clear information grouping
+- Include micro-interactions, hover effects, and page/load transitions
+
+⚙️ Technical Stack:
+- Next.js 14+ with App Router
+- Tailwind CSS + Framer Motion for styling & animations
+- Mock data using `faker.js` or realistic static JSON
+- Modular component architecture: MetricCard, ChartCard, DataTable, Layout, Sidebar, Topbar
+
+---
+
+🧩 ADDITIONAL PAGES (TABS) — Build out the following routes with page-specific features:
+
+📈 **/campaigns** — Marketing Campaign Insights
+- Campaign cards (with performance status: Running, Completed, Failed)
+- KPI progress bars with animated fill
+- Tag filters (platform: Google, Meta, etc.)
+- Timeline chart showing campaign duration
+- Animated toast for new campaign creation (mocked)
+
+🧑‍💻 **/audience** — Audience Intelligence
+- Geographic heatmap (mock or placeholder)
+- Demographics breakdown (age, gender, device type)
+- Audience growth line chart
+- Animated filters: Location, Segment, Source
+- AI-generated persona suggestions (static text)
+
+📊 **/reports** — Exportable AI Summaries
+- Dynamic report builder with:
+  - Chart selection + export as PDF/CSV
+  - AI summary feed (hardcoded text)
+  - Date-range selector with animated calendar
+- Add loading skeletons while reports "generate"
+- Floating action button (FAB) to generate PDF report
+
+⚙️ **/settings** — User Preferences
+- Dark/Light mode toggle (persistent via localStorage)
+- Notification toggle switches
+- Animated theme color pickers
+- Language selector dropdown with animation
+- Option to reset dashboard layout
+
+---
+
+✨ Bonus Features to Include Across the App:
+- Beautiful loading skeletons for all content blocks
+- Sticky topbar with animated page titles
+- Responsive sidebar with slide/fade transition
+- Toast notifications (e.g. “Export completed”, “Campaign created”)
+- Custom 404 and loading screens with motion
+- Use Framer Motion `layoutId` for smooth page transitions
+
+Start by scaffolding the app with a responsive sidebar layout and the `/overview` route. Then help me build reusable components (e.g., `<MetricCard />`, `<ChartCard />`, `<DataTable />`) with polished UI and animations.

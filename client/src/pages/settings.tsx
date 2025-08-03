@@ -1,573 +1,679 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 import { 
   Settings as SettingsIcon, 
   Bell, 
-  Link, 
-  Users, 
-  CreditCard,
-  Chrome,
-  Trash2
+  Palette, 
+  Globe, 
+  Shield, 
+  User,
+  Monitor,
+  Moon,
+  Sun,
+  Smartphone,
+  Mail,
+  MessageSquare,
+  Volume2,
+  Save,
+  RotateCcw
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Slider } from "@/components/ui/slider";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
+import { useTheme } from "@/hooks/use-theme";
+import { useToastManager } from "@/components/toast-notifications";
 
-interface SettingsNavProps {
-  currentSection: string;
-  onSectionChange: (section: string) => void;
-}
+// Theme color options
+const themeColors = [
+  { name: "Blue", value: "blue", color: "#3B82F6" },
+  { name: "Green", value: "green", color: "#10B981" },
+  { name: "Purple", value: "purple", color: "#8B5CF6" },
+  { name: "Orange", value: "orange", color: "#F59E0B" },
+  { name: "Red", value: "red", color: "#EF4444" },
+  { name: "Pink", value: "pink", color: "#EC4899" },
+  { name: "Indigo", value: "indigo", color: "#6366F1" },
+  { name: "Teal", value: "teal", color: "#14B8A6" }
+];
 
-function SettingsNav({ currentSection, onSectionChange }: SettingsNavProps) {
-  const settingsNavItems = [
-    { id: "general", label: "General", icon: SettingsIcon },
-    { id: "notifications", label: "Notifications", icon: Bell },
-    { id: "integrations", label: "Integrations", icon: Link },
-    { id: "team", label: "Team Management", icon: Users },
-    { id: "billing", label: "Billing", icon: CreditCard },
-  ];
+// Language options
+const languages = [
+  { code: "en", name: "English", flag: "🇺🇸" },
+  { code: "es", name: "Español", flag: "🇪🇸" },
+  { code: "fr", name: "Français", flag: "🇫🇷" },
+  { code: "de", name: "Deutsch", flag: "🇩🇪" },
+  { code: "it", name: "Italiano", flag: "🇮🇹" },
+  { code: "pt", name: "Português", flag: "🇵🇹" },
+  { code: "ja", name: "日本語", flag: "🇯🇵" },
+  { code: "ko", name: "한국어", flag: "🇰🇷" }
+];
 
+function SettingsSection({ 
+  title, 
+  description, 
+  icon: Icon, 
+  children 
+}: { 
+  title: string; 
+  description: string; 
+  icon: any; 
+  children: React.ReactNode;
+}) {
   return (
-    <nav className="space-y-1">
-      {settingsNavItems.map((item) => {
-        const Icon = item.icon;
-        return (
-          <button
-            key={item.id}
-            onClick={() => onSectionChange(item.id)}
-            className={`settings-nav-item w-full ${currentSection === item.id ? 'active' : ''}`}
-          >
-            <Icon className="w-4 h-4" />
-            <span>{item.label}</span>
-          </button>
-        );
-      })}
-    </nav>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+    >
+      <Card>
+        <CardHeader>
+          <div className="flex items-center space-x-3">
+            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
+              <Icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            </div>
+            <div>
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+                {title}
+              </CardTitle>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {description}
+              </p>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {children}
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
-function GeneralSettings() {
-  const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    firstName: "John",
-    lastName: "Smith",
-    email: "john.smith@company.com",
-    dateRange: "last30",
-    currency: "USD",
-    timezone: "PT"
-  });
-
-  const handleSave = () => {
-    toast({
-      title: "Settings saved",
-      description: "Your profile and preferences have been updated.",
-    });
-  };
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
+function ColorPicker({ 
+  selectedColor, 
+  onColorChange 
+}: { 
+  selectedColor: string; 
+  onColorChange: (color: string) => void;
+}) {
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Profile Information</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange("firstName", e.target.value)}
-                className="mt-2"
-              />
-            </div>
-            
-            <div>
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange("lastName", e.target.value)}
-                className="mt-2"
-              />
-            </div>
-            
-            <div className="md:col-span-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                className="mt-2"
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Dashboard Preferences</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="dateRange">Default Date Range</Label>
-              <Select value={formData.dateRange} onValueChange={(value) => handleInputChange("dateRange", value)}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="last30">Last 30 days</SelectItem>
-                  <SelectItem value="last7">Last 7 days</SelectItem>
-                  <SelectItem value="thisMonth">This month</SelectItem>
-                  <SelectItem value="thisQuarter">This quarter</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="currency">Currency</Label>
-              <Select value={formData.currency} onValueChange={(value) => handleInputChange("currency", value)}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="USD">USD ($)</SelectItem>
-                  <SelectItem value="EUR">EUR (€)</SelectItem>
-                  <SelectItem value="GBP">GBP (£)</SelectItem>
-                  <SelectItem value="CAD">CAD (C$)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div>
-              <Label htmlFor="timezone">Time Zone</Label>
-              <Select value={formData.timezone} onValueChange={(value) => handleInputChange("timezone", value)}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="PT">Pacific Time (PT)</SelectItem>
-                  <SelectItem value="ET">Eastern Time (ET)</SelectItem>
-                  <SelectItem value="CT">Central Time (CT)</SelectItem>
-                  <SelectItem value="MT">Mountain Time (MT)</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Button onClick={handleSave}>
-        Save Changes
-      </Button>
-    </div>
-  );
-}
-
-function NotificationSettings() {
-  const { toast } = useToast();
-  const [notifications, setNotifications] = useState({
-    campaignAlerts: true,
-    weeklyReports: true,
-    budgetWarnings: true,
-    performanceUpdates: false,
-    systemMaintenance: true
-  });
-
-  const handleSave = () => {
-    toast({
-      title: "Notification settings saved",
-      description: "Your notification preferences have been updated.",
-    });
-  };
-
-  const handleNotificationChange = (key: string, value: boolean) => {
-    setNotifications(prev => ({ ...prev, [key]: value }));
-  };
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Email Notifications</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="font-medium">Campaign Alerts</Label>
-                <p className="text-muted-foreground text-sm">Get notified when campaigns need attention</p>
-              </div>
-              <Checkbox
-                checked={notifications.campaignAlerts}
-                onCheckedChange={(checked) => handleNotificationChange("campaignAlerts", !!checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="font-medium">Weekly Reports</Label>
-                <p className="text-muted-foreground text-sm">Receive weekly performance summaries</p>
-              </div>
-              <Checkbox
-                checked={notifications.weeklyReports}
-                onCheckedChange={(checked) => handleNotificationChange("weeklyReports", !!checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="font-medium">Budget Warnings</Label>
-                <p className="text-muted-foreground text-sm">Alert when campaigns approach budget limits</p>
-              </div>
-              <Checkbox
-                checked={notifications.budgetWarnings}
-                onCheckedChange={(checked) => handleNotificationChange("budgetWarnings", !!checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="font-medium">Performance Updates</Label>
-                <p className="text-muted-foreground text-sm">Daily performance summaries</p>
-              </div>
-              <Checkbox
-                checked={notifications.performanceUpdates}
-                onCheckedChange={(checked) => handleNotificationChange("performanceUpdates", !!checked)}
-              />
-            </div>
-            
-            <div className="flex items-center justify-between">
-              <div>
-                <Label className="font-medium">System Maintenance</Label>
-                <p className="text-muted-foreground text-sm">Notifications about system updates and maintenance</p>
-              </div>
-              <Checkbox
-                checked={notifications.systemMaintenance}
-                onCheckedChange={(checked) => handleNotificationChange("systemMaintenance", !!checked)}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Button onClick={handleSave}>
-        Save Changes
-      </Button>
-    </div>
-  );
-}
-
-function IntegrationsSettings() {
-  const { toast } = useToast();
-  
-  const integrations = [
-    {
-      name: "Google Ads",
-      account: "ads@company.com",
-      connected: true,
-      icon: Chrome,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100"
-    },
-    {
-      name: "Facebook Ads",
-      account: "marketing@company.com",
-      connected: true,
-      icon: Chrome,
-      color: "text-green-600",
-      bgColor: "bg-green-100"
-    },
-    {
-      name: "LinkedIn Ads",
-      account: "Not connected",
-      connected: false,
-      icon: Chrome,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100"
-    },
-    {
-      name: "TikTok Ads",
-      account: "Not connected",
-      connected: false,
-      icon: Chrome,
-      color: "text-red-600",
-      bgColor: "bg-red-100"
-    }
-  ];
-
-  const handleDisconnect = (integrationName: string) => {
-    toast({
-      title: "Integration disconnected",
-      description: `${integrationName} has been disconnected from your account.`,
-    });
-  };
-
-  const handleConnect = (integrationName: string) => {
-    toast({
-      title: "Integration connected",
-      description: `${integrationName} has been connected to your account.`,
-    });
-  };
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Connected Platforms</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          {integrations.map((integration, index) => {
-            const Icon = integration.icon;
-            return (
-              <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                <div className="flex items-center space-x-3">
-                  <div className={`w-10 h-10 ${integration.bgColor} rounded-lg flex items-center justify-center`}>
-                    <Icon className={`w-5 h-5 ${integration.color}`} />
-                  </div>
-                  <div>
-                    <p className="font-medium">{integration.name}</p>
-                    <p className="text-muted-foreground text-sm">
-                      {integration.connected ? `Connected account: ${integration.account}` : integration.account}
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Badge 
-                    variant={integration.connected ? "default" : "secondary"}
-                    className={integration.connected ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}
-                  >
-                    {integration.connected ? "Connected" : "Not Connected"}
-                  </Badge>
-                  {integration.connected ? (
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="text-red-600 hover:text-red-700"
-                      onClick={() => handleDisconnect(integration.name)}
-                    >
-                      Disconnect
-                    </Button>
-                  ) : (
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleConnect(integration.name)}
-                    >
-                      Connect
-                    </Button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-function TeamSettings() {
-  const { toast } = useToast();
-  
-  const teamMembers = [
-    {
-      name: "John Smith",
-      email: "john.smith@company.com",
-      role: "Admin",
-      status: "Active"
-    },
-    {
-      name: "Sarah Johnson",
-      email: "sarah.johnson@company.com",
-      role: "Manager",
-      status: "Active"
-    },
-    {
-      name: "Mike Wilson",
-      email: "mike.wilson@company.com",
-      role: "Analyst",
-      status: "Invited"
-    }
-  ];
-
-  const handleRemoveMember = (memberName: string) => {
-    toast({
-      title: "Team member removed",
-      description: `${memberName} has been removed from the team.`,
-    });
-  };
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Team Members</CardTitle>
-            <Button>Invite Member</Button>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {teamMembers.map((member, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border border-border rounded-lg">
-                <div>
-                  <p className="font-medium">{member.name}</p>
-                  <p className="text-muted-foreground text-sm">{member.email}</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Badge variant="outline">{member.role}</Badge>
-                  <Badge 
-                    variant={member.status === "Active" ? "default" : "secondary"}
-                    className={member.status === "Active" ? "bg-green-100 text-green-800 hover:bg-green-100" : ""}
-                  >
-                    {member.status}
-                  </Badge>
-                  {member.name !== "John Smith" && (
-                    <Button 
-                      variant="ghost" 
-                      size="icon"
-                      className="text-red-600 hover:text-red-700"
-                      onClick={() => handleRemoveMember(member.name)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-function BillingSettings() {
-  const { toast } = useToast();
-  
-  const handleUpdatePayment = () => {
-    toast({
-      title: "Payment method updated",
-      description: "Your payment information has been updated successfully.",
-    });
-  };
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Current Plan</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="font-medium text-lg">Professional Plan</p>
-                <p className="text-muted-foreground">$99/month • Up to 10 campaigns</p>
-              </div>
-              <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Current Plan</Badge>
-            </div>
-            
-            <div className="border-t border-border pt-4">
-              <div className="flex justify-between items-center mb-2">
-                <span>Monthly Limit</span>
-                <span>10 campaigns</span>
-              </div>
-              <div className="flex justify-between items-center mb-2">
-                <span>Current Usage</span>
-                <span>2 campaigns</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span>Next Billing Date</span>
-                <span>January 15, 2025</span>
-              </div>
-            </div>
-            
-            <div className="flex space-x-2 pt-4">
-              <Button>Upgrade Plan</Button>
-              <Button variant="outline">View All Plans</Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Payment Method</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex items-center justify-between p-4 border border-border rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-                  <CreditCard className="w-5 h-5 text-gray-600" />
-                </div>
-                <div>
-                  <p className="font-medium">•••• •••• •••• 4242</p>
-                  <p className="text-muted-foreground text-sm">Expires 12/26</p>
-                </div>
-              </div>
-              <Button variant="outline" onClick={handleUpdatePayment}>
-                Update
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="grid grid-cols-4 gap-3">
+      {themeColors.map((color) => (
+        <motion.button
+          key={color.value}
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          onClick={() => onColorChange(color.value)}
+          className={`w-12 h-12 rounded-full border-4 transition-all duration-200 ${
+            selectedColor === color.value
+              ? 'border-gray-900 dark:border-white shadow-lg'
+              : 'border-gray-200 dark:border-gray-700'
+          }`}
+          style={{ backgroundColor: color.color }}
+          title={color.name}
+        >
+          {selectedColor === color.value && (
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="w-full h-full rounded-full flex items-center justify-center"
+            >
+              <div className="w-3 h-3 bg-white rounded-full" />
+            </motion.div>
+          )}
+        </motion.button>
+      ))}
     </div>
   );
 }
 
 export default function Settings() {
-  const [currentSection, setCurrentSection] = useState("general");
+  const { theme, setTheme } = useTheme();
+  const { showSuccess } = useToastManager();
 
-  const renderSettingsContent = () => {
-    switch (currentSection) {
-      case "notifications":
-        return <NotificationSettings />;
-      case "integrations":
-        return <IntegrationsSettings />;
-      case "team":
-        return <TeamSettings />;
-      case "billing":
-        return <BillingSettings />;
-      default:
-        return <GeneralSettings />;
-    }
+  // Settings state
+  const [notifications, setNotifications] = useState({
+    email: true,
+    push: true,
+    sms: false,
+    marketing: true,
+    reports: true,
+    alerts: true
+  });
+
+  const [preferences, setPreferences] = useState({
+    language: "en",
+    timezone: "UTC",
+    currency: "USD",
+    dateFormat: "MM/DD/YYYY",
+    themeColor: "blue",
+    volume: [75],
+    autoRefresh: true,
+    compactMode: false
+  });
+
+  const [privacy, setPrivacy] = useState({
+    analytics: true,
+    tracking: false,
+    dataSharing: false,
+    cookieConsent: true
+  });
+
+  const handleSaveSettings = () => {
+    // Save settings to localStorage or API
+    localStorage.setItem('settings', JSON.stringify({ notifications, preferences, privacy }));
+    showSuccess("Settings Saved", "Your preferences have been updated successfully.");
+  };
+
+  const handleResetSettings = () => {
+    setNotifications({
+      email: true,
+      push: true,
+      sms: false,
+      marketing: true,
+      reports: true,
+      alerts: true
+    });
+    setPreferences({
+      language: "en",
+      timezone: "UTC",
+      currency: "USD",
+      dateFormat: "MM/DD/YYYY",
+      themeColor: "blue",
+      volume: [75],
+      autoRefresh: true,
+      compactMode: false
+    });
+    setPrivacy({
+      analytics: true,
+      tracking: false,
+      dataSharing: false,
+      cookieConsent: true
+    });
+    showSuccess("Settings Reset", "All settings have been restored to defaults.");
   };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-semibold mb-2">Settings</h2>
-        <p className="text-muted-foreground">Configure your dashboard preferences and account settings</p>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Settings Navigation */}
-        <div className="lg:col-span-1">
-          <SettingsNav currentSection={currentSection} onSectionChange={setCurrentSection} />
+    <motion.div 
+      className="p-6 space-y-8 bg-transparent min-h-screen"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0"
+      >
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            User Preferences
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Customize your dashboard experience and manage your account settings
+          </p>
         </div>
+        <div className="flex space-x-3">
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button onClick={handleResetSettings} variant="outline">
+              <RotateCcw className="h-4 w-4 mr-2" />
+              Reset
+            </Button>
+          </motion.div>
+          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+            <Button onClick={handleSaveSettings} className="bg-blue-600 hover:bg-blue-700">
+              <Save className="h-4 w-4 mr-2" />
+              Save Changes
+            </Button>
+          </motion.div>
+        </div>
+      </motion.div>
 
-        {/* Settings Content */}
-        <div className="lg:col-span-3">
-          <div className="animate-fade-in">
-            {renderSettingsContent()}
+      {/* Appearance Settings */}
+      <SettingsSection
+        title="Appearance"
+        description="Customize the look and feel of your dashboard"
+        icon={Palette}
+      >
+        <div className="space-y-6">
+          {/* Theme Mode */}
+          <div>
+            <Label className="text-sm font-medium text-gray-900 dark:text-white mb-3 block">
+              Theme Mode
+            </Label>
+            <div className="flex items-center space-x-4">
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setTheme("light")}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
+                  theme === "light"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                    : "border-gray-200 dark:border-gray-700"
+                }`}
+              >
+                <Sun className="h-4 w-4" />
+                <span>Light</span>
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setTheme("dark")}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
+                  theme === "dark"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                    : "border-gray-200 dark:border-gray-700"
+                }`}
+              >
+                <Moon className="h-4 w-4" />
+                <span>Dark</span>
+              </motion.button>
+              
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setTheme("system")}
+                className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
+                  theme === "system"
+                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                    : "border-gray-200 dark:border-gray-700"
+                }`}
+              >
+                <Monitor className="h-4 w-4" />
+                <span>System</span>
+              </motion.button>
+            </div>
+          </div>
+
+          {/* Theme Colors */}
+          <div>
+            <Label className="text-sm font-medium text-gray-900 dark:text-white mb-3 block">
+              Accent Color
+            </Label>
+            <ColorPicker
+              selectedColor={preferences.themeColor}
+              onColorChange={(color) => 
+                setPreferences(prev => ({ ...prev, themeColor: color }))
+              }
+            />
+          </div>
+
+          {/* Layout Options */}
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Compact Mode
+              </Label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Reduce spacing and padding for more content
+              </p>
+            </div>
+            <Switch
+              checked={preferences.compactMode}
+              onCheckedChange={(checked) =>
+                setPreferences(prev => ({ ...prev, compactMode: checked }))
+              }
+            />
           </div>
         </div>
-      </div>
-    </div>
+      </SettingsSection>
+
+      {/* Notifications */}
+      <SettingsSection
+        title="Notifications"
+        description="Manage how and when you receive notifications"
+        icon={Bell}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Mail className="h-4 w-4 text-gray-500" />
+              <div>
+                <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                  Email Notifications
+                </Label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Receive notifications via email
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={notifications.email}
+              onCheckedChange={(checked) =>
+                setNotifications(prev => ({ ...prev, email: checked }))
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Smartphone className="h-4 w-4 text-gray-500" />
+              <div>
+                <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                  Push Notifications
+                </Label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Receive push notifications on your device
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={notifications.push}
+              onCheckedChange={(checked) =>
+                setNotifications(prev => ({ ...prev, push: checked }))
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <MessageSquare className="h-4 w-4 text-gray-500" />
+              <div>
+                <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                  SMS Notifications
+                </Label>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Receive important alerts via SMS
+                </p>
+              </div>
+            </div>
+            <Switch
+              checked={notifications.sms}
+              onCheckedChange={(checked) =>
+                setNotifications(prev => ({ ...prev, sms: checked }))
+              }
+            />
+          </div>
+
+          <Separator />
+
+          <div className="space-y-3">
+            <Label className="text-sm font-medium text-gray-900 dark:text-white">
+              Notification Types
+            </Label>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Campaign Alerts</span>
+              <Switch
+                checked={notifications.alerts}
+                onCheckedChange={(checked) =>
+                  setNotifications(prev => ({ ...prev, alerts: checked }))
+                }
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Weekly Reports</span>
+              <Switch
+                checked={notifications.reports}
+                onCheckedChange={(checked) =>
+                  setNotifications(prev => ({ ...prev, reports: checked }))
+                }
+              />
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Marketing Updates</span>
+              <Switch
+                checked={notifications.marketing}
+                onCheckedChange={(checked) =>
+                  setNotifications(prev => ({ ...prev, marketing: checked }))
+                }
+              />
+            </div>
+          </div>
+
+          {/* Volume Control */}
+          <div>
+            <div className="flex items-center justify-between mb-3">
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Notification Volume
+              </Label>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {preferences.volume[0]}%
+              </span>
+            </div>
+            <div className="flex items-center space-x-3">
+              <Volume2 className="h-4 w-4 text-gray-400" />
+              <Slider
+                value={preferences.volume}
+                onValueChange={(value) =>
+                  setPreferences(prev => ({ ...prev, volume: value }))
+                }
+                max={100}
+                step={5}
+                className="flex-1"
+              />
+            </div>
+          </div>
+        </div>
+      </SettingsSection>
+
+      {/* Language & Region */}
+      <SettingsSection
+        title="Language & Region"
+        description="Set your language, timezone, and regional preferences"
+        icon={Globe}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <Label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">
+              Language
+            </Label>
+            <Select value={preferences.language} onValueChange={(value) =>
+              setPreferences(prev => ({ ...prev, language: value }))
+            }>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.code} value={lang.code}>
+                    <div className="flex items-center space-x-2">
+                      <span>{lang.flag}</span>
+                      <span>{lang.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">
+              Timezone
+            </Label>
+            <Select value={preferences.timezone} onValueChange={(value) =>
+              setPreferences(prev => ({ ...prev, timezone: value }))
+            }>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="UTC">UTC (Universal Time)</SelectItem>
+                <SelectItem value="PST">PST (Pacific Standard Time)</SelectItem>
+                <SelectItem value="EST">EST (Eastern Standard Time)</SelectItem>
+                <SelectItem value="CST">CST (Central Standard Time)</SelectItem>
+                <SelectItem value="GMT">GMT (Greenwich Mean Time)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">
+              Currency
+            </Label>
+            <Select value={preferences.currency} onValueChange={(value) =>
+              setPreferences(prev => ({ ...prev, currency: value }))
+            }>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="USD">USD ($)</SelectItem>
+                <SelectItem value="EUR">EUR (€)</SelectItem>
+                <SelectItem value="GBP">GBP (£)</SelectItem>
+                <SelectItem value="JPY">JPY (¥)</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">
+              Date Format
+            </Label>
+            <Select value={preferences.dateFormat} onValueChange={(value) =>
+              setPreferences(prev => ({ ...prev, dateFormat: value }))
+            }>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="MM/DD/YYYY">MM/DD/YYYY</SelectItem>
+                <SelectItem value="DD/MM/YYYY">DD/MM/YYYY</SelectItem>
+                <SelectItem value="YYYY-MM-DD">YYYY-MM-DD</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+      </SettingsSection>
+
+      {/* Privacy & Security */}
+      <SettingsSection
+        title="Privacy & Security"
+        description="Control your data privacy and security settings"
+        icon={Shield}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Analytics Collection
+              </Label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Help improve the platform by sharing usage analytics
+              </p>
+            </div>
+            <Switch
+              checked={privacy.analytics}
+              onCheckedChange={(checked) =>
+                setPrivacy(prev => ({ ...prev, analytics: checked }))
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Activity Tracking
+              </Label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Track user activity for personalized recommendations
+              </p>
+            </div>
+            <Switch
+              checked={privacy.tracking}
+              onCheckedChange={(checked) =>
+                setPrivacy(prev => ({ ...prev, tracking: checked }))
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Data Sharing
+              </Label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Share anonymized data with partners for insights
+              </p>
+            </div>
+            <Switch
+              checked={privacy.dataSharing}
+              onCheckedChange={(checked) =>
+                setPrivacy(prev => ({ ...prev, dataSharing: checked }))
+              }
+            />
+          </div>
+
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Cookie Consent
+              </Label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Allow cookies for enhanced functionality
+              </p>
+            </div>
+            <Switch
+              checked={privacy.cookieConsent}
+              onCheckedChange={(checked) =>
+                setPrivacy(prev => ({ ...prev, cookieConsent: checked }))
+              }
+            />
+          </div>
+        </div>
+      </SettingsSection>
+
+      {/* Dashboard Preferences */}
+      <SettingsSection
+        title="Dashboard"
+        description="Customize your dashboard layout and behavior"
+        icon={SettingsIcon}
+      >
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Auto-refresh Data
+              </Label>
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Automatically refresh dashboard data every 5 minutes
+              </p>
+            </div>
+            <Switch
+              checked={preferences.autoRefresh}
+              onCheckedChange={(checked) =>
+                setPreferences(prev => ({ ...prev, autoRefresh: checked }))
+              }
+            />
+          </div>
+
+          <div>
+            <Label className="text-sm font-medium text-gray-900 dark:text-white mb-2 block">
+              Default Dashboard View
+            </Label>
+            <Select defaultValue="overview">
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="overview">Overview</SelectItem>
+                <SelectItem value="campaigns">Campaigns</SelectItem>
+                <SelectItem value="audience">Audience</SelectItem>
+                <SelectItem value="reports">Reports</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <Button 
+            variant="outline" 
+            className="w-full"
+            onClick={() => showSuccess("Layout Reset", "Dashboard layout has been reset to default.")}
+          >
+            <RotateCcw className="h-4 w-4 mr-2" />
+            Reset Dashboard Layout
+          </Button>
+        </div>
+      </SettingsSection>
+    </motion.div>
   );
 }

@@ -1,295 +1,420 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { 
+  Image, 
+  Video, 
+  Play, 
+  Eye, 
+  ThumbsUp, 
+  Share2, 
+  TrendingUp,
+  Filter,
+  Search,
+  MoreHorizontal,
+  Download
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Trophy, MousePointer, FlaskConical } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { MetricCard } from "@/components/metric-card";
+import { ChartCard } from "@/components/chart-card";
+import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  LineChart,
+  Line
+} from "recharts";
+import { faker } from "@faker-js/faker";
 
-function MetricCard({ 
-  title, 
-  value, 
-  subtitle, 
-  icon: Icon, 
-  colorClass 
-}: {
-  title: string;
-  value: string;
-  subtitle: string;
-  icon: React.ElementType;
-  colorClass: string;
-}) {
-  return (
-    <Card>
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold">{title}</h3>
-          <Icon className={`w-5 h-5 ${colorClass}`} />
-        </div>
-        <p className="text-lg font-bold mb-2">{value}</p>
-        <p className="text-muted-foreground text-sm">{subtitle}</p>
-      </CardContent>
-    </Card>
-  );
-}
+// Generate creative performance data
+const generateCreativeData = () => {
+  return Array.from({ length: 12 }, (_, i) => ({
+    id: faker.string.uuid(),
+    name: faker.commerce.productName(),
+    type: faker.helpers.arrayElement(['image', 'video', 'carousel']),
+    platform: faker.helpers.arrayElement(['Facebook', 'Instagram', 'Google Ads', 'LinkedIn', 'TikTok']),
+    impressions: faker.number.int({ min: 50000, max: 500000 }),
+    clicks: faker.number.int({ min: 2000, max: 25000 }),
+    conversions: faker.number.int({ min: 100, max: 1500 }),
+    engagement: faker.number.float({ min: 2.5, max: 8.5, fractionDigits: 1 }),
+    thumbnail: `https://picsum.photos/300/200?random=${i}`,
+    status: faker.helpers.arrayElement(['active', 'paused', 'draft']),
+    createdAt: faker.date.recent({ days: 30 })
+  }));
+};
 
-function CreativeCard({ 
-  title, 
-  imageUrl, 
-  ctr, 
-  cvr, 
-  impressions 
-}: {
-  title: string;
-  imageUrl: string;
-  ctr: string;
-  cvr: string;
-  impressions: string;
-}) {
-  return (
-    <Card className="border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="aspect-video bg-muted flex items-center justify-center">
-        <img 
-          src={imageUrl} 
-          alt={title}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            const target = e.target as HTMLImageElement;
-            target.style.display = 'none';
-            target.parentElement!.innerHTML = '<div class="text-muted-foreground text-sm">Image placeholder</div>';
-          }}
-        />
-      </div>
-      
-      <CardContent className="p-4">
-        <h4 className="font-semibold text-sm mb-2">{title}</h4>
-        <div className="space-y-1 text-xs text-muted-foreground">
-          <div className="flex justify-between">
-            <span>CTR:</span>
-            <span className="font-medium text-green-600">{ctr}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>CVR:</span>
-            <span className="font-medium text-blue-600">{cvr}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Impressions:</span>
-            <span className="font-medium">{impressions}</span>
-          </div>
-        </div>
-        
-        <div className="flex space-x-2 mt-3">
-          <Button className="flex-1" size="sm">
-            Analyze
-          </Button>
-          <Button variant="outline" className="flex-1" size="sm">
-            A/B Test
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+// Performance timeline data
+const performanceData = Array.from({ length: 7 }, (_, i) => ({
+  date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+  impressions: faker.number.int({ min: 80000, max: 150000 }),
+  engagement: faker.number.float({ min: 3.5, max: 7.2, fractionDigits: 1 }),
+  ctr: faker.number.float({ min: 2.1, max: 4.8, fractionDigits: 2 })
+}));
 
-function TestRow({ 
-  testName, 
-  description, 
-  variants, 
-  split, 
-  confidence, 
-  winner 
-}: {
-  testName: string;
-  description: string;
-  variants: string;
-  split: string;
-  confidence: string;
-  winner: string;
-}) {
+// Top performing creatives by type
+const creativeTypeData = [
+  { type: 'Video', performance: 87, count: 145 },
+  { type: 'Carousel', performance: 76, count: 89 },
+  { type: 'Single Image', performance: 64, count: 234 },
+  { type: 'Stories', performance: 72, count: 156 }
+];
+
+const statusColors = {
+  active: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
+  paused: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
+  draft: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400"
+};
+
+const typeIcons = {
+  image: Image,
+  video: Video,
+  carousel: Image
+};
+
+function CreativeCard({ creative, index }: { creative: any, index: number }) {
+  const Icon = typeIcons[creative.type as keyof typeof typeIcons];
+  const ctr = ((creative.clicks / creative.impressions) * 100).toFixed(2);
+  const conversionRate = ((creative.conversions / creative.clicks) * 100).toFixed(2);
+
   return (
-    <tr className="border-b border-border">
-      <td className="p-4">
-        <div>
-          <p className="font-medium">{testName}</p>
-          <p className="text-muted-foreground text-sm">{description}</p>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: index * 0.1 }}
+      whileHover={{ y: -4 }}
+    >
+      <Card className="overflow-hidden hover:shadow-lg transition-all duration-200">
+        <div className="relative">
+          <img 
+            src={creative.thumbnail} 
+            alt={creative.name}
+            className="w-full h-48 object-cover"
+          />
+          <div className="absolute top-2 right-2">
+            <Badge className={statusColors[creative.status as keyof typeof statusColors]}>
+              {creative.status.charAt(0).toUpperCase() + creative.status.slice(1)}
+            </Badge>
+          </div>
+          <div className="absolute bottom-2 left-2">
+            <Badge variant="secondary" className="bg-black/50 text-white">
+              <Icon className="h-3 w-3 mr-1" />
+              {creative.type}
+            </Badge>
+          </div>
+          {creative.type === 'video' && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center"
+              >
+                <Play className="h-6 w-6 text-white ml-1" />
+              </motion.div>
+            </div>
+          )}
         </div>
-      </td>
-      <td className="p-4">{variants}</td>
-      <td className="p-4">{split}</td>
-      <td className="p-4">
-        <Badge 
-          variant="default"
-          className="bg-green-100 text-green-800 hover:bg-green-100"
-        >
-          {confidence}
-        </Badge>
-      </td>
-      <td className="p-4">{winner}</td>
-      <td className="p-4">
-        <Button variant="link" className="text-primary hover:text-primary/80 text-sm p-0">
-          View Results
-        </Button>
-      </td>
-    </tr>
+
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div>
+              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">
+                {creative.name}
+              </CardTitle>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{creative.platform}</p>
+            </div>
+            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <MoreHorizontal className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Performance Metrics */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="text-center">
+              <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                {creative.impressions.toLocaleString()}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Impressions</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                {creative.clicks.toLocaleString()}
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Clicks</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                {ctr}%
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">CTR</div>
+            </div>
+            <div className="text-center">
+              <div className="text-sm font-semibold text-gray-900 dark:text-white">
+                {creative.engagement}%
+              </div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Engagement</div>
+            </div>
+          </div>
+
+          {/* Engagement Progress */}
+          <div className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600 dark:text-gray-400">Performance Score</span>
+              <span className="text-gray-900 dark:text-white font-medium">{creative.engagement}%</span>
+            </div>
+            <Progress value={creative.engagement * 10} className="h-2" />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex space-x-2">
+            <Button size="sm" variant="outline" className="flex-1">
+              <Eye className="h-3 w-3 mr-1" />
+              View
+            </Button>
+            <Button size="sm" variant="outline" className="flex-1">
+              <Download className="h-3 w-3 mr-1" />
+              Download
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }
 
 export default function Creative() {
-  const creativeAssets = [
-    {
-      title: "Tech Workspace Ad",
-      imageUrl: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=250",
-      ctr: "4.8%",
-      cvr: "8.2%",
-      impressions: "45.2K"
-    },
-    {
-      title: "Holiday Sale Banner",
-      imageUrl: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=250",
-      ctr: "5.3%",
-      cvr: "12.1%",
-      impressions: "38.7K"
-    },
-    {
-      title: "Product Showcase",
-      imageUrl: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=250",
-      ctr: "3.9%",
-      cvr: "6.8%",
-      impressions: "52.1K"
-    },
-    {
-      title: "Brand Story Video",
-      imageUrl: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&h=250",
-      ctr: "6.2%",
-      cvr: "15.4%",
-      impressions: "29.8K"
-    }
-  ];
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedType, setSelectedType] = useState("all");
+  const [selectedPlatform, setSelectedPlatform] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
 
-  const abTests = [
+  const creatives = generateCreativeData();
+
+  const filteredCreatives = creatives.filter(creative => {
+    const matchesSearch = creative.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesType = selectedType === "all" || creative.type === selectedType;
+    const matchesPlatform = selectedPlatform === "all" || creative.platform === selectedPlatform;
+    const matchesStatus = selectedStatus === "all" || creative.status === selectedStatus;
+    return matchesSearch && matchesType && matchesPlatform && matchesStatus;
+  });
+
+  const metrics = [
     {
-      testName: "Holiday CTA Test",
-      description: "Testing button colors",
-      variants: "2 variants",
-      split: "50/50",
-      confidence: "95%",
-      winner: "Variant B"
+      title: "Total Creatives",
+      value: creatives.length.toString(),
+      change: "+12 this week",
+      changeType: "positive" as const,
+      icon: Image
     },
     {
-      testName: "Headline Comparison",
-      description: "Testing headline variations",
-      variants: "3 variants",
-      split: "33/33/34",
-      confidence: "87%",
-      winner: "Variant A"
+      title: "Avg. CTR",
+      value: "3.24%",
+      change: "+0.8% this week",
+      changeType: "positive" as const,
+      icon: TrendingUp
     },
     {
-      testName: "Image Style Test",
-      description: "Lifestyle vs Product shots",
-      variants: "2 variants",
-      split: "50/50",
-      confidence: "92%",
-      winner: "Variant A"
+      title: "Total Impressions",
+      value: creatives.reduce((sum, c) => sum + c.impressions, 0).toLocaleString(),
+      change: "+18.5% this week",
+      changeType: "positive" as const,
+      icon: Eye
+    },
+    {
+      title: "Engagement Rate",
+      value: "5.8%",
+      change: "+1.2% this week",
+      changeType: "positive" as const,
+      icon: ThumbsUp
     }
   ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h2 className="text-2xl font-semibold mb-2">Creative Performance</h2>
-        <p className="text-muted-foreground">Analyze and optimize your ad creatives for maximum impact</p>
+    <motion.div 
+      className="p-6 space-y-8 bg-transparent min-h-screen"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Header */}
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0"
+      >
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Creative Performance
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Analyze and optimize your creative assets across all campaigns
+          </p>
+        </div>
+        <motion.div
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Button className="bg-blue-600 hover:bg-blue-700">
+            <Download className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
+        </motion.div>
+      </motion.div>
+
+      {/* Metrics */}
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+      >
+        {metrics.map((metric, index) => (
+          <MetricCard key={metric.title} {...metric} index={index} />
+        ))}
+      </motion.div>
+
+      {/* Performance Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <ChartCard title="Creative Performance Trends" index={0}>
+          <ResponsiveContainer width="100%" height={250}>
+            <LineChart data={performanceData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#6B7280" />
+              <YAxis tick={{ fontSize: 12 }} stroke="#6B7280" />
+              <Tooltip contentStyle={{ backgroundColor: 'white', border: '1px solid #E5E7EB', borderRadius: '8px' }} />
+              <Line type="monotone" dataKey="engagement" stroke="#3B82F6" strokeWidth={2} dot={{ fill: '#3B82F6' }} />
+              <Line type="monotone" dataKey="ctr" stroke="#10B981" strokeWidth={2} dot={{ fill: '#10B981' }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </ChartCard>
+
+        <ChartCard title="Performance by Creative Type" index={1}>
+          <ResponsiveContainer width="100%" height={250}>
+            <BarChart data={creativeTypeData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+              <XAxis dataKey="type" tick={{ fontSize: 12 }} stroke="#6B7280" />
+              <YAxis tick={{ fontSize: 12 }} stroke="#6B7280" />
+              <Tooltip 
+                contentStyle={{ backgroundColor: 'white', border: '1px solid #E5E7EB', borderRadius: '8px' }}
+                formatter={(value: any, name: any) => [`${value}%`, 'Performance Score']}
+              />
+              <Bar dataKey="performance" fill="#3B82F6" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </ChartCard>
       </div>
 
-      {/* Creative Performance Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <MetricCard
-          title="Top Performing Creative"
-          value="Holiday Banner v3"
-          subtitle="CTR: 5.8% | CVR: 12.4%"
-          icon={Trophy}
-          colorClass="text-yellow-600"
-        />
-        
-        <MetricCard
-          title="Avg. CTR"
-          value="3.2%"
-          subtitle="+0.4% vs last month"
-          icon={MousePointer}
-          colorClass="text-blue-600"
-        />
-        
-        <MetricCard
-          title="Active A/B Tests"
-          value="8"
-          subtitle="2 concluding soon"
-          icon={FlaskConical}
-          colorClass="text-green-600"
-        />
-      </div>
-
-      {/* Creative Gallery */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle>Creative Assets</CardTitle>
-            <div className="flex space-x-2">
-              <Button variant="default" size="sm">All</Button>
-              <Button variant="ghost" size="sm">Images</Button>
-              <Button variant="ghost" size="sm">Videos</Button>
-              <Button variant="ghost" size="sm">Carousels</Button>
-            </div>
+      {/* Filters */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="flex flex-col sm:flex-row gap-4 bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700"
+      >
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Input
+              placeholder="Search creatives..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
+            />
           </div>
-        </CardHeader>
-        
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {creativeAssets.map((asset, index) => (
+        </div>
+
+        <Select value={selectedType} onValueChange={setSelectedType}>
+          <SelectTrigger className="w-[180px]">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="All Types" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Types</SelectItem>
+            <SelectItem value="image">Image</SelectItem>
+            <SelectItem value="video">Video</SelectItem>
+            <SelectItem value="carousel">Carousel</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedPlatform} onValueChange={setSelectedPlatform}>
+          <SelectTrigger className="w-[180px]">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="All Platforms" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Platforms</SelectItem>
+            <SelectItem value="Facebook">Facebook</SelectItem>
+            <SelectItem value="Instagram">Instagram</SelectItem>
+            <SelectItem value="Google Ads">Google Ads</SelectItem>
+            <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+            <SelectItem value="TikTok">TikTok</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+          <SelectTrigger className="w-[180px]">
+            <Filter className="h-4 w-4 mr-2" />
+            <SelectValue placeholder="All Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="active">Active</SelectItem>
+            <SelectItem value="paused">Paused</SelectItem>
+            <SelectItem value="draft">Draft</SelectItem>
+          </SelectContent>
+        </Select>
+      </motion.div>
+
+      {/* Creatives Grid */}
+      <AnimatePresence mode="wait">
+        {filteredCreatives.length > 0 ? (
+          <motion.div
+            key="creatives-grid"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+          >
+            {filteredCreatives.map((creative, index) => (
               <CreativeCard
-                key={index}
-                title={asset.title}
-                imageUrl={asset.imageUrl}
-                ctr={asset.ctr}
-                cvr={asset.cvr}
-                impressions={asset.impressions}
+                key={creative.id}
+                creative={creative}
+                index={index}
               />
             ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* A/B Testing Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Active A/B Tests</CardTitle>
-        </CardHeader>
-        
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-muted">
-                <tr>
-                  <th className="text-left p-4 font-semibold">Test Name</th>
-                  <th className="text-left p-4 font-semibold">Variants</th>
-                  <th className="text-left p-4 font-semibold">Traffic Split</th>
-                  <th className="text-left p-4 font-semibold">Confidence</th>
-                  <th className="text-left p-4 font-semibold">Winner</th>
-                  <th className="text-left p-4 font-semibold">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {abTests.map((test, index) => (
-                  <TestRow
-                    key={index}
-                    testName={test.testName}
-                    description={test.description}
-                    variants={test.variants}
-                    split={test.split}
-                    confidence={test.confidence}
-                    winner={test.winner}
-                  />
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="no-creatives"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.3 }}
+            className="text-center py-12"
+          >
+            <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Image className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              No creatives found
+            </h3>
+            <p className="text-gray-500 dark:text-gray-400">
+              No creatives match your current filters.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
