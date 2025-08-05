@@ -41,7 +41,7 @@ export function FloatingActionButton({ onExportPDF, onExportCSV, onShare, onCrea
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-300 px-3 py-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 text-sm font-medium whitespace-nowrap"
+                className="bg-gray-800 text-gray-300 px-3 py-2 rounded-lg shadow-lg border border-gray-700 text-sm font-medium whitespace-nowrap"
               >
                 {action.label}
               </motion.div>

@@ -73,7 +73,7 @@ function AppContent() {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ duration: 0.5 }}
-      className="flex h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900"
+      className="flex h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900"
     >
       <Sidebar />
       
@@ -118,7 +118,7 @@ function AppContent() {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider>
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

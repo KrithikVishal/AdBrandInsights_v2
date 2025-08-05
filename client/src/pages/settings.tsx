@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useTheme } from "@/hooks/use-theme";
+
 import { useToastManager } from "@/components/toast-notifications";
 
 // Theme color options
@@ -73,14 +73,14 @@ function SettingsSection({
       <Card>
         <CardHeader>
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-              <Icon className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="p-2 bg-blue-900/20 rounded-lg">
+              <Icon className="h-5 w-5 text-blue-400" />
             </div>
             <div>
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+              <CardTitle className="text-lg font-semibold text-white">
                 {title}
               </CardTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 {description}
               </p>
             </div>
@@ -111,8 +111,8 @@ function ColorPicker({
           onClick={() => onColorChange(color.value)}
           className={`w-12 h-12 rounded-full border-4 transition-all duration-200 ${
             selectedColor === color.value
-              ? 'border-gray-900 dark:border-white shadow-lg'
-              : 'border-gray-200 dark:border-gray-700'
+              ? 'border-white shadow-lg'
+              : 'border-gray-700'
           }`}
           style={{ backgroundColor: color.color }}
           title={color.name}
@@ -133,7 +133,7 @@ function ColorPicker({
 }
 
 export default function Settings() {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const { showSuccess } = useToastManager();
 
   // Settings state
@@ -243,54 +243,23 @@ export default function Settings() {
         icon={Palette}
       >
         <div className="space-y-6">
-          {/* Theme Mode */}
+          {/* Theme Mode - Now Dark Only */}
           <div>
-            <Label className="text-sm font-medium text-gray-900 dark:text-white mb-3 block">
+            <Label className="text-sm font-medium text-white mb-3 block">
               Theme Mode
             </Label>
             <div className="flex items-center space-x-4">
-              <motion.button
+              <motion.div
                 whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setTheme("light")}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
-                  theme === "light"
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-gray-200 dark:border-gray-700"
-                }`}
+                className="flex items-center space-x-2 px-4 py-2 rounded-lg border-2 border-blue-500 bg-blue-900/20"
               >
-                <Sun className="h-4 w-4" />
-                <span>Light</span>
-              </motion.button>
-              
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setTheme("dark")}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
-                  theme === "dark"
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-gray-200 dark:border-gray-700"
-                }`}
-              >
-                <Moon className="h-4 w-4" />
-                <span>Dark</span>
-              </motion.button>
-              
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setTheme("system")}
-                className={`flex items-center space-x-2 px-4 py-2 rounded-lg border-2 transition-all duration-200 ${
-                  theme === "system"
-                    ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                    : "border-gray-200 dark:border-gray-700"
-                }`}
-              >
-                <Monitor className="h-4 w-4" />
-                <span>System</span>
-              </motion.button>
+                <Moon className="h-4 w-4 text-blue-400" />
+                <span className="text-white">Dark Mode (Active)</span>
+              </motion.div>
             </div>
+            <p className="text-xs text-gray-400 mt-2">
+              This application is optimized for dark mode only
+            </p>
           </div>
 
           {/* Theme Colors */}

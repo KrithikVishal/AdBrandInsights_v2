@@ -6,7 +6,7 @@ interface LoadingSkeletonProps {
 }
 
 export function LoadingSkeleton({ className = "", variant = "card" }: LoadingSkeletonProps) {
-  const baseClasses = "bg-gray-200 dark:bg-gray-700 rounded animate-pulse";
+  const baseClasses = "bg-gray-700 rounded animate-pulse";
   
   const variants = {
     card: "h-32 w-full",

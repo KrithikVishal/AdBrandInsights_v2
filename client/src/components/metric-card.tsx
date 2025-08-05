@@ -13,9 +13,9 @@ interface MetricCardProps {
 
 export function MetricCard({ title, value, change, changeType, icon: Icon, index }: MetricCardProps) {
   const changeColor = {
-    positive: "text-green-600 dark:text-green-400",
-    negative: "text-red-600 dark:text-red-400",
-    neutral: "text-gray-600 dark:text-gray-400",
+    positive: "text-green-400",
+    negative: "text-red-400",
+    neutral: "text-gray-400",
   };
 
   return (
@@ -32,26 +32,26 @@ export function MetricCard({ title, value, change, changeType, icon: Icon, index
         transition: { duration: 0.2 }
       }}
     >
-      <Card className="relative overflow-hidden bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow duration-300">
+      <Card className="relative overflow-hidden bg-gray-800 border-gray-700 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
         <motion.div
-          className="absolute inset-0 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/10 dark:to-purple-900/10 opacity-0"
+          className="absolute inset-0 bg-gradient-to-r from-blue-900/10 to-purple-900/10 opacity-0"
           whileHover={{ opacity: 1 }}
           transition={{ duration: 0.3 }}
         />
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-          <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-300">
+          <CardTitle className="text-sm font-medium text-gray-300">
             {title}
           </CardTitle>
           <motion.div
             whileHover={{ rotate: 360 }}
             transition={{ duration: 0.5 }}
           >
-            <Icon className="h-4 w-4 text-gray-500 dark:text-gray-400" />
+            <Icon className="h-4 w-4 text-gray-400" />
           </motion.div>
         </CardHeader>
         <CardContent className="relative z-10">
           <motion.div 
-            className="text-2xl font-bold text-gray-900 dark:text-white"
+            className="text-2xl font-bold text-white"
             initial={{ scale: 0.8 }}
             animate={{ scale: 1 }}
             transition={{ duration: 0.3, delay: index * 0.1 + 0.2 }}

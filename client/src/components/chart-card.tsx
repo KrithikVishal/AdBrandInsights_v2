@@ -21,14 +21,14 @@ export function ChartCard({ title, children, index = 0, className = "" }: ChartC
       }}
       className={className}
     >
-      <Card className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300">
+      <Card className="bg-gray-800 border-gray-700 hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-300">
         <CardHeader>
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.4, delay: index * 0.15 + 0.2 }}
           >
-            <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white">
+            <CardTitle className="text-lg font-semibold text-white">
               {title}
             </CardTitle>
           </motion.div>

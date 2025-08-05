@@ -11,18 +11,18 @@ interface CampaignCardProps {
 }
 
 const statusColors = {
-  active: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-  paused: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
-  draft: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
-  completed: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400"
+  active: "bg-green-900/20 text-green-400",
+  paused: "bg-yellow-900/20 text-yellow-400",
+  draft: "bg-gray-900/20 text-gray-400",
+  completed: "bg-blue-900/20 text-blue-400"
 };
 
 const platformColors = {
-  "Google Ads": "bg-red-50 border-red-200 dark:bg-red-900/10 dark:border-red-800",
-  "Facebook": "bg-blue-50 border-blue-200 dark:bg-blue-900/10 dark:border-blue-800",
-  "LinkedIn": "bg-blue-50 border-blue-200 dark:bg-blue-900/10 dark:border-blue-800",
-  "Twitter": "bg-sky-50 border-sky-200 dark:bg-sky-900/10 dark:border-sky-800",
-  "TikTok": "bg-pink-50 border-pink-200 dark:bg-pink-900/10 dark:border-pink-800"
+  "Google Ads": "bg-red-900/10 border-red-800",
+  "Facebook": "bg-blue-900/10 border-blue-800",
+  "LinkedIn": "bg-blue-900/10 border-blue-800",
+  "Twitter": "bg-sky-900/10 border-sky-800",
+  "TikTok": "bg-pink-900/10 border-pink-800"
 };
 
 export function CampaignCard({ campaign, index }: CampaignCardProps) {
@@ -37,14 +37,14 @@ export function CampaignCard({ campaign, index }: CampaignCardProps) {
       transition={{ duration: 0.4, delay: index * 0.1 }}
       whileHover={{ y: -4 }}
     >
-      <Card className={`relative overflow-hidden ${platformColors[campaign.platform as keyof typeof platformColors] || 'bg-white dark:bg-gray-800'} border hover:shadow-lg transition-all duration-200`}>
+      <Card className={`relative overflow-hidden ${platformColors[campaign.platform as keyof typeof platformColors] || 'bg-gray-800'} border hover:shadow-lg hover:shadow-blue-500/10 transition-all duration-200`}>
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="space-y-1">
-              <CardTitle className="text-lg font-semibold text-gray-900 dark:text-white line-clamp-1">
+              <CardTitle className="text-lg font-semibold text-white line-clamp-1">
                 {campaign.name}
               </CardTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <p className="text-sm text-gray-400">
                 {campaign.platform}
               </p>
             </div>
@@ -66,53 +66,53 @@ export function CampaignCard({ campaign, index }: CampaignCardProps) {
           {/* Budget and Objective */}
           <div className="space-y-2">
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Budget</span>
-              <span className="font-semibold text-gray-900 dark:text-white">
+              <span className="text-sm text-gray-400">Budget</span>
+              <span className="font-semibold text-white">
                 ${campaign.budget ? parseFloat(campaign.budget).toLocaleString() : '0'}
               </span>
             </div>
             <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600 dark:text-gray-400">Objective</span>
-              <span className="text-sm font-medium text-gray-900 dark:text-white capitalize">
+              <span className="text-sm text-gray-400">Objective</span>
+              <span className="text-sm font-medium text-white capitalize">
                 {campaign.objective?.replace('_', ' ')}
               </span>
             </div>
           </div>
 
           {/* Performance Metrics */}
-          <div className="grid grid-cols-3 gap-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="grid grid-cols-3 gap-4 pt-3 border-t border-gray-700">
             <div className="text-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-blue-100 dark:bg-blue-900/20 rounded-full mx-auto mb-1">
-                <Eye className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+              <div className="flex items-center justify-center w-8 h-8 bg-blue-900/20 rounded-full mx-auto mb-1">
+                <Eye className="h-4 w-4 text-blue-400" />
               </div>
-              <div className="text-sm font-semibold text-gray-900 dark:text-white">
+              <div className="text-sm font-semibold text-white">
                 {impressions.toLocaleString()}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-gray-400">
                 Impressions
               </div>
             </div>
             
             <div className="text-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-green-100 dark:bg-green-900/20 rounded-full mx-auto mb-1">
-                <MousePointer className="h-4 w-4 text-green-600 dark:text-green-400" />
+              <div className="flex items-center justify-center w-8 h-8 bg-green-900/20 rounded-full mx-auto mb-1">
+                <MousePointer className="h-4 w-4 text-green-400" />
               </div>
-              <div className="text-sm font-semibold text-gray-900 dark:text-white">
+              <div className="text-sm font-semibold text-white">
                 {clicks.toLocaleString()}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-gray-400">
                 Clicks
               </div>
             </div>
             
             <div className="text-center">
-              <div className="flex items-center justify-center w-8 h-8 bg-purple-100 dark:bg-purple-900/20 rounded-full mx-auto mb-1">
-                <TrendingUp className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              <div className="flex items-center justify-center w-8 h-8 bg-purple-900/20 rounded-full mx-auto mb-1">
+                <TrendingUp className="h-4 w-4 text-purple-400" />
               </div>
-              <div className="text-sm font-semibold text-gray-900 dark:text-white">
+              <div className="text-sm font-semibold text-white">
                 {ctr}%
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-gray-400">
                 CTR
               </div>
             </div>

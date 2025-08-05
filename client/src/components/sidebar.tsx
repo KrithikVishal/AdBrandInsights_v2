@@ -8,8 +8,7 @@ import {
   TrendingUp, 
   FileText, 
   Settings, 
-  Moon, 
-  Sun,
+
   Menu,
   X,
   Brain
@@ -30,7 +29,7 @@ const menuItems = [
 
 export function Sidebar() {
   const [location] = useLocation();
-  const { theme, toggleTheme } = useTheme();
+  const { theme } = useTheme();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   const sidebarVariants = {
@@ -72,10 +71,10 @@ export function Sidebar() {
     <motion.aside
       variants={sidebarVariants}
       animate={isCollapsed ? "collapsed" : "expanded"}
-      className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-screen sticky top-0 overflow-hidden"
+      className="bg-gray-800 border-r border-gray-700 flex flex-col h-screen sticky top-0 overflow-hidden"
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+      <div className="p-4 border-b border-gray-700">
         <div className="flex items-center justify-between">
           <AnimatePresence>
             {!isCollapsed && (
@@ -94,10 +93,10 @@ export function Sidebar() {
                   <Brain className="h-5 w-5 text-white" />
                 </motion.div>
                 <div>
-                  <h1 className="text-lg font-bold text-gray-900 dark:text-white">
+                  <h1 className="text-lg font-bold text-white">
                     ADmyBRAND
                   </h1>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                  <p className="text-xs text-gray-400">
                     Insights
                   </p>
                 </div>
@@ -112,7 +111,7 @@ export function Sidebar() {
               variant="ghost"
               size="sm"
               onClick={() => setIsCollapsed(!isCollapsed)}
-              className="text-gray-600 dark:text-gray-300"
+              className="text-gray-300"
             >
               <motion.div
                 animate={{ rotate: isCollapsed ? 180 : 0 }}
@@ -144,8 +143,8 @@ export function Sidebar() {
                   whileTap={{ scale: 0.98 }}
                   className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                     isActive
-                      ? "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-r-2 border-blue-600 dark:border-blue-400"
-                      : "text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                      ? "bg-blue-900/20 text-blue-400 border-r-2 border-blue-400"
+                      : "text-gray-300 hover:bg-gray-700/50"
                   }`}
                 >
                   <motion.div
@@ -170,7 +169,7 @@ export function Sidebar() {
                   {isActive && !isCollapsed && (
                     <motion.div
                       layoutId="activeIndicator"
-                      className="ml-auto w-2 h-2 bg-blue-600 dark:bg-blue-400 rounded-full"
+                      className="ml-auto w-2 h-2 bg-blue-400 rounded-full"
                       transition={{ duration: 0.3 }}
                     />
                   )}
@@ -181,46 +180,7 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Theme Toggle */}
-      <div className="p-4 border-t border-gray-200 dark:border-gray-700">
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Button
-            variant="ghost"
-            onClick={toggleTheme}
-            className={`w-full justify-start text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700/50 ${
-              isCollapsed ? "justify-center px-0" : ""
-            }`}
-          >
-            <motion.div
-              animate={{ rotate: theme === 'dark' ? 180 : 0 }}
-              transition={{ duration: 0.5 }}
-              className={isCollapsed ? "" : "mr-3"}
-            >
-              {theme === 'dark' ? (
-                <Sun className="h-5 w-5" />
-              ) : (
-                <Moon className="h-5 w-5" />
-              )}
-            </motion.div>
-            <AnimatePresence>
-              {!isCollapsed && (
-                <motion.span
-                  variants={contentVariants}
-                  initial="collapsed"
-                  animate="expanded"
-                  exit="collapsed"
-                  className="font-medium"
-                >
-                  {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                </motion.span>
-              )}
-            </AnimatePresence>
-          </Button>
-        </motion.div>
-      </div>
+
 
       {/* Version Info */}
       <AnimatePresence>
@@ -232,10 +192,10 @@ export function Sidebar() {
             exit="collapsed"
             className="p-4 text-center"
           >
-            <div className="text-xs text-gray-400 dark:text-gray-500">
+            <div className="text-xs text-gray-500">
               Version 2.1.0
             </div>
-            <div className="text-xs text-gray-400 dark:text-gray-500">
+            <div className="text-xs text-gray-500">
               AI-Powered Analytics
             </div>
           </motion.div>
