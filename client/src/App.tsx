@@ -79,16 +79,25 @@ function AppContent() {
       
       <main className="flex-1 overflow-auto">
         <AnimatePresence mode="wait">
-          <Switch>
-            <Route path="/" component={Overview} />
-            <Route path="/campaigns" component={Campaigns} />
-            <Route path="/audience" component={Audience} />
-            <Route path="/creative" component={Creative} />
-            <Route path="/conversion" component={Conversion} />
-            <Route path="/reports" component={Reports} />
-            <Route path="/settings" component={Settings} />
-            <Route component={NotFound} />
-          </Switch>
+          <motion.div
+            key={window.location.pathname}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="h-full"
+          >
+            <Switch>
+              <Route path="/" component={Overview} />
+              <Route path="/campaigns" component={Campaigns} />
+              <Route path="/audience" component={Audience} />
+              <Route path="/creative" component={Creative} />
+              <Route path="/conversion" component={Conversion} />
+              <Route path="/reports" component={Reports} />
+              <Route path="/settings" component={Settings} />
+              <Route component={NotFound} />
+            </Switch>
+          </motion.div>
         </AnimatePresence>
       </main>
 

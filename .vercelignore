@@ -1,0 +1,12 @@
+node_modules
+.env
+.env.local
+.env.production.local
+.env.development.local
+.git
+.replit
+.upm
+replit.nix
+*.log
+dist
+client/dist

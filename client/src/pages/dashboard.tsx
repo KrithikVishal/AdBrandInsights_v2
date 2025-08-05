@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams } from "wouter";
-import Sidebar from "@/components/sidebar";
+import { Sidebar } from "@/components/sidebar";
 import Header from "@/components/header";
 import Overview from "./overview";
 import Campaigns from "./campaigns";
@@ -41,7 +41,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen flex bg-background">
-      <Sidebar onNavigate={setCurrentPage} currentPage={currentPage} />
+      <Sidebar />
       
       <main className="flex-1 overflow-hidden">
         <Header title={currentPage} />
