@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADmyBRAND Insights - Advanced Analytics Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        border: "hsl(214.3 31.8% 91.4%)",
+                        input: "hsl(214.3 31.8% 91.4%)",
+                        ring: "hsl(221.2 84% 70.9%)",
+                        background: "hsl(0 0% 100%)",
+                        foreground: "hsl(222.2 84% 4.9%)",
+                        primary: {
+                            DEFAULT: "hsl(221.2 84% 70.9%)",
+                            foreground: "hsl(210 40% 98%)",
+                        },
+                        secondary: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                        destructive: {
+                            DEFAULT: "hsl(0 84.2% 60.2%)",
+                            foreground: "hsl(210 40% 98%)",
+                        },
+                        muted: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(215.4 16.3% 46.9%)",
+                        },
+                        accent: {
+                            DEFAULT: "hsl(210 40% 96%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                        popover: {
+                            DEFAULT: "hsl(0 0% 100%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                        card: {
+                            DEFAULT: "hsl(0 0% 100%)",
+                            foreground: "hsl(222.2 84% 4.9%)",
+                        },
+                    },
+                    borderRadius: {
+                        lg: "var(--radius)",
+                        md: "calc(var(--radius) - 2px)",
+                        sm: "calc(var(--radius) - 4px)",
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        :root {
+            --radius: 0.5rem;
+        }
+        .dark {
+            --background: 222.2 84% 4.9%;
+            --foreground: 210 40% 98%;
+            --card: 222.2 84% 4.9%;
+            --card-foreground: 210 40% 98%;
+            --popover: 222.2 84% 4.9%;
+            --popover-foreground: 210 40% 98%;
+            --primary: 217.2 91.2% 59.8%;
+            --primary-foreground: 222.2 84% 4.9%;
+            --secondary: 217.2 32.6% 17.5%;
+            --secondary-foreground: 210 40% 98%;
+            --muted: 217.2 32.6% 17.5%;
+            --muted-foreground: 215 20.2% 65.1%;
+            --accent: 217.2 32.6% 17.5%;
+            --accent-foreground: 210 40% 98%;
+            --destructive: 0 62.8% 30.6%;
+            --destructive-foreground: 210 40% 98%;
+            --border: 217.2 32.6% 17.5%;
+            --input: 217.2 32.6% 17.5%;
+            --ring: 224.3 76.3% 94.1%;
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground font-sans">
+    <div class="min-h-screen flex">
+        <!-- @COMPONENT: Sidebar Navigation -->
+        <aside class="w-64 bg-card border-r border-border flex flex-col">
+            <div class="p-6 border-b border-border">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-primary-foreground"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg">ADmyBRAND</h1>
+                        <p class="text-muted-foreground text-sm">Insights</p>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="flex-1 p-4 space-y-2">
+                <!-- @STATE: currentPage:string = 'overview' -->
+                <a href="#overview" class="nav-item active" data-page="overview">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Overview</span>
+                </a>
+                
+                <a href="#campaigns" class="nav-item" data-page="campaigns">
+                    <i data-lucide="megaphone" class="w-5 h-5"></i>
+                    <span>Campaign Management</span>
+                </a>
+                
+                <a href="#audience" class="nav-item" data-page="audience">
+                    <i data-lucide="users" class="w-5 h-5"></i>
+                    <span>Audience Analytics</span>
+                </a>
+                
+                <a href="#creative" class="nav-item" data-page="creative">
+                    <i data-lucide="image" class="w-5 h-5"></i>
+                    <span>Creative Performance</span>
+                </a>
+                
+                <a href="#conversion" class="nav-item" data-page="conversion">
+                    <i data-lucide="target" class="w-5 h-5"></i>
+                    <span>Conversion Tracking</span>
+                </a>
+                
+                <a href="#reports" class="nav-item" data-page="reports">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>Reports & Export</span>
+                </a>
+                
+                <a href="#settings" class="nav-item" data-page="settings">
+                    <i data-lucide="settings" class="w-5 h-5"></i>
+                    <span>Settings</span>
+                </a>
+            </nav>
+            
+            <div class="p-4 border-t border-border">
+                <button class="w-full flex items-center space-x-3 p-3 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors">
+                    <i data-lucide="user" class="w-5 h-5"></i>
+                    <span class="text-sm">John Smith</span>
+                </button>
+            </div>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar Navigation -->
+
+        <!-- Main Content Area -->
+        <main class="flex-1 overflow-hidden">
+            <!-- @COMPONENT: Header -->
+            <header class="bg-card border-b border-border p-4 flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <h2 class="text-2xl font-semibold" data-bind="pageTitle">Overview Dashboard</h2>
+                    <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Live</span>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 bg-muted rounded-lg p-1">
+                        <button class="px-3 py-1 bg-background rounded text-sm shadow-sm">Light</button>
+                        <button class="px-3 py-1 text-sm text-muted-foreground hover:text-foreground">Dark</button>
+                    </div>
+                    
+                    <button class="p-2 hover:bg-accent rounded-lg transition-colors">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                    </button>
+                    
+                    <button class="p-2 hover:bg-accent rounded-lg transition-colors">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </header>
+            <!-- @END_COMPONENT: Header -->
+
+            <div class="p-6 overflow-y-auto max-h-screen">
+                <!-- @COMPONENT: Overview Page -->
+                <div id="overview-page" class="page-content">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <!-- Key Metrics Cards -->
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-muted-foreground text-sm">Total Revenue</p>
+                                    <p class="text-2xl font-bold text-green-600" data-bind="metrics.totalRevenue">$2,847,392</p>
+                                </div>
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="dollar-sign" class="w-6 h-6 text-green-600"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-4 text-sm">
+                                <span class="text-green-600 font-medium">+12.5%</span>
+                                <span class="text-muted-foreground ml-2">vs last month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-muted-foreground text-sm">ROAS</p>
+                                    <p class="text-2xl font-bold text-blue-600" data-bind="metrics.roas">4.8x</p>
+                                </div>
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="trending-up" class="w-6 h-6 text-blue-600"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-4 text-sm">
+                                <span class="text-green-600 font-medium">+8.2%</span>
+                                <span class="text-muted-foreground ml-2">vs last month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-muted-foreground text-sm">Conversions</p>
+                                    <p class="text-2xl font-bold text-purple-600" data-bind="metrics.conversions">18,426</p>
+                                </div>
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-4 text-sm">
+                                <span class="text-green-600 font-medium">+15.3%</span>
+                                <span class="text-muted-foreground ml-2">vs last month</span>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-muted-foreground text-sm">Ad Spend</p>
+                                    <p class="text-2xl font-bold text-orange-600" data-bind="metrics.adSpend">$594,280</p>
+                                </div>
+                                <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="credit-card" class="w-6 h-6 text-orange-600"></i>
+                                </div>
+                            </div>
+                            <div class="flex items-center mt-4 text-sm">
+                                <span class="text-red-600 font-medium">+5.1%</span>
+                                <span class="text-muted-foreground ml-2">vs last month</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <h3 class="text-lg font-semibold mb-4">Revenue Trend</h3>
+                            <div class="h-64 bg-muted rounded flex items-center justify-center">
+                                <!-- @FUNCTIONALITY: Line chart showing revenue over time using Recharts -->
+                                <p class="text-muted-foreground">Revenue Chart Placeholder</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <h3 class="text-lg font-semibold mb-4">Channel Performance</h3>
+                            <div class="h-64 bg-muted rounded flex items-center justify-center">
+                                <!-- @FUNCTIONALITY: Bar chart showing performance by channel using Recharts -->
+                                <p class="text-muted-foreground">Channel Chart Placeholder</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Campaigns Table -->
+                    <div class="bg-card rounded-lg border border-border">
+                        <div class="p-6 border-b border-border">
+                            <h3 class="text-lg font-semibold">Active Campaigns</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-muted">
+                                    <tr>
+                                        <th class="text-left p-4 font-semibold">Campaign</th>
+                                        <th class="text-left p-4 font-semibold">Status</th>
+                                        <th class="text-left p-4 font-semibold">Spend</th>
+                                        <th class="text-left p-4 font-semibold">Revenue</th>
+                                        <th class="text-left p-4 font-semibold">ROAS</th>
+                                        <th class="text-left p-4 font-semibold">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- @MAP: campaigns.map(campaign => ( -->
+                                    <tr class="border-b border-border" data-mock="true">
+                                        <td class="p-4">
+                                            <div>
+                                                <p class="font-medium">Black Friday Sale</p>
+                                                <p class="text-muted-foreground text-sm">Google Ads • Social</p>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Active</span>
+                                        </td>
+                                        <td class="p-4 font-mono">$15,240</td>
+                                        <td class="p-4 font-mono">$73,890</td>
+                                        <td class="p-4 font-mono text-green-600">4.85x</td>
+                                        <td class="p-4">
+                                            <button class="p-1 hover:bg-accent rounded">
+                                                <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- @END_MAP )) -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Overview Page -->
+
+                <!-- @COMPONENT: Campaign Management Page -->
+                <div id="campaigns-page" class="page-content hidden">
+                    <div class="flex items-center justify-between mb-6">
+                        <div>
+                            <h2 class="text-2xl font-semibold">Campaign Management</h2>
+                            <p class="text-muted-foreground">Create, manage, and optimize your advertising campaigns</p>
+                        </div>
+                        <button class="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors" data-event="click:openCreateCampaignModal">
+                            <i data-lucide="plus" class="w-4 h-4 mr-2 inline"></i>
+                            Create Campaign
+                        </button>
+                    </div>
+
+                    <!-- Filters and Search -->
+                    <div class="bg-card p-4 rounded-lg border border-border mb-6">
+                        <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex-1 min-w-64">
+                                <div class="relative">
+                                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"></i>
+                                    <input type="text" placeholder="Search campaigns..." class="w-full pl-10 pr-4 py-2 border border-input rounded-lg bg-background" data-mock="true">
+                                </div>
+                            </div>
+                            
+                            <select class="px-3 py-2 border border-input rounded-lg bg-background" data-mock="true">
+                                <option>All Platforms</option>
+                                <option>Google Ads</option>
+                                <option>Facebook</option>
+                                <option>LinkedIn</option>
+                            </select>
+                            
+                            <select class="px-3 py-2 border border-input rounded-lg bg-background" data-mock="true">
+                                <option>All Status</option>
+                                <option>Active</option>
+                                <option>Paused</option>
+                                <option>Draft</option>
+                            </select>
+                            
+                            <button class="p-2 hover:bg-accent rounded-lg border border-input">
+                                <i data-lucide="filter" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Grid -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                        <!-- @MAP: campaigns.map(campaign => ( -->
+                        <div class="bg-card p-6 rounded-lg border border-border hover:shadow-lg transition-shadow" data-mock="true">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex-1">
+                                    <h3 class="font-semibold text-lg mb-1">Holiday Shopping Campaign</h3>
+                                    <div class="flex items-center space-x-2 text-sm text-muted-foreground">
+                                        <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Google Ads</span>
+                                        <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Active</span>
+                                    </div>
+                                </div>
+                                <button class="p-1 hover:bg-accent rounded" data-event="click:openCampaignMenu">
+                                    <i data-lucide="more-vertical" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="space-y-3 mb-4">
+                                <div class="flex justify-between">
+                                    <span class="text-muted-foreground">Budget:</span>
+                                    <span class="font-mono font-medium">$50,000</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-muted-foreground">Spent:</span>
+                                    <span class="font-mono font-medium">$32,450</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-muted-foreground">ROAS:</span>
+                                    <span class="font-mono font-medium text-green-600">5.2x</span>
+                                </div>
+                            </div>
+                            
+                            <div class="w-full bg-muted rounded-full h-2 mb-4">
+                                <div class="bg-primary h-2 rounded-full" style="width: 65%"></div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-primary text-primary-foreground py-2 px-3 rounded text-sm hover:bg-primary/90 transition-colors" data-event="click:editCampaign">
+                                    Edit
+                                </button>
+                                <button class="flex-1 border border-input py-2 px-3 rounded text-sm hover:bg-accent transition-colors" data-event="click:viewCampaignDetails">
+                                    View Details
+                                </button>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Campaign Management Page -->
+
+                <!-- @COMPONENT: Audience Analytics Page -->
+                <div id="audience-page" class="page-content hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold mb-2">Audience Analytics</h2>
+                        <p class="text-muted-foreground">Deep insights into your audience demographics and behavior</p>
+                    </div>
+
+                    <!-- Audience Overview Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Total Audience</h3>
+                                <i data-lucide="users" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="audience.total">2.4M</p>
+                            <p class="text-muted-foreground text-sm">+18% this month</p>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Avg. Age</h3>
+                                <i data-lucide="calendar" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="audience.avgAge">32.5</p>
+                            <p class="text-muted-foreground text-sm">years old</p>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Top Gender</h3>
+                                <i data-lucide="user-check" class="w-5 h-5 text-purple-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="audience.topGender">Female</p>
+                            <p class="text-muted-foreground text-sm">58% of audience</p>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Engagement Rate</h3>
+                                <i data-lucide="heart" class="w-5 h-5 text-red-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="audience.engagement">4.8%</p>
+                            <p class="text-muted-foreground text-sm">+0.3% vs last month</p>
+                        </div>
+                    </div>
+
+                    <!-- Demographics Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <h3 class="text-lg font-semibold mb-4">Age Distribution</h3>
+                            <div class="h-64 bg-muted rounded flex items-center justify-center">
+                                <!-- @FUNCTIONALITY: Bar chart showing age groups using Recharts -->
+                                <p class="text-muted-foreground">Age Distribution Chart</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <h3 class="text-lg font-semibold mb-4">Geographic Distribution</h3>
+                            <div class="h-64 bg-muted rounded flex items-center justify-center">
+                                <!-- @FUNCTIONALITY: Map visualization showing geographic data -->
+                                <p class="text-muted-foreground">Geographic Map Placeholder</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Audience Segments -->
+                    <div class="bg-card rounded-lg border border-border">
+                        <div class="p-6 border-b border-border">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Audience Segments</h3>
+                                <button class="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm">
+                                    Create Segment
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <!-- @MAP: segments.map(segment => ( -->
+                                <div class="flex items-center justify-between p-4 border border-border rounded-lg" data-mock="true">
+                                    <div>
+                                        <h4 class="font-semibold">High-Value Customers</h4>
+                                        <p class="text-muted-foreground text-sm">Users with LTV > $500</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <p class="font-semibold">125,430</p>
+                                        <p class="text-muted-foreground text-sm">5.2% of total</p>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Audience Analytics Page -->
+
+                <!-- @COMPONENT: Creative Performance Page -->
+                <div id="creative-page" class="page-content hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold mb-2">Creative Performance</h2>
+                        <p class="text-muted-foreground">Analyze and optimize your ad creatives for maximum impact</p>
+                    </div>
+
+                    <!-- Creative Performance Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Top Performing Creative</h3>
+                                <i data-lucide="trophy" class="w-5 h-5 text-yellow-600"></i>
+                            </div>
+                            <p class="text-lg font-bold mb-2" data-bind="creative.topPerformer">Holiday Banner v3</p>
+                            <p class="text-muted-foreground text-sm">CTR: 5.8% | CVR: 12.4%</p>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Avg. CTR</h3>
+                                <i data-lucide="mouse-pointer" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="creative.avgCTR">3.2%</p>
+                            <p class="text-muted-foreground text-sm">+0.4% vs last month</p>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Active A/B Tests</h3>
+                                <i data-lucide="flask" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="creative.activeTests">8</p>
+                            <p class="text-muted-foreground text-sm">2 concluding soon</p>
+                        </div>
+                    </div>
+
+                    <!-- Creative Gallery -->
+                    <div class="bg-card rounded-lg border border-border mb-8">
+                        <div class="p-6 border-b border-border">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Creative Assets</h3>
+                                <div class="flex space-x-2">
+                                    <button class="px-3 py-1 text-sm bg-primary text-primary-foreground rounded">All</button>
+                                    <button class="px-3 py-1 text-sm text-muted-foreground hover:text-foreground">Images</button>
+                                    <button class="px-3 py-1 text-sm text-muted-foreground hover:text-foreground">Videos</button>
+                                    <button class="px-3 py-1 text-sm text-muted-foreground hover:text-foreground">Carousels</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <!-- @MAP: creatives.map(creative => ( -->
+                                <div class="border border-border rounded-lg overflow-hidden hover:shadow-lg transition-shadow" data-mock="true">
+                                    <!-- Modern tech workspace with laptops and coffee -->
+                                    <img src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250" alt="Modern workspace creative" class="w-full h-32 object-cover" data-mock-image="true">
+                                    
+                                    <div class="p-4">
+                                        <h4 class="font-semibold text-sm mb-2">Tech Workspace Ad</h4>
+                                        <div class="space-y-1 text-xs text-muted-foreground">
+                                            <div class="flex justify-between">
+                                                <span>CTR:</span>
+                                                <span class="font-medium text-green-600">4.8%</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span>CVR:</span>
+                                                <span class="font-medium text-blue-600">8.2%</span>
+                                            </div>
+                                            <div class="flex justify-between">
+                                                <span>Impressions:</span>
+                                                <span class="font-medium">45.2K</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="flex space-x-2 mt-3">
+                                            <button class="flex-1 bg-primary text-primary-foreground py-1 px-2 rounded text-xs hover:bg-primary/90 transition-colors">
+                                                Analyze
+                                            </button>
+                                            <button class="flex-1 border border-input py-1 px-2 rounded text-xs hover:bg-accent transition-colors">
+                                                A/B Test
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- A/B Testing Section -->
+                    <div class="bg-card rounded-lg border border-border">
+                        <div class="p-6 border-b border-border">
+                            <h3 class="text-lg font-semibold">Active A/B Tests</h3>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-muted">
+                                    <tr>
+                                        <th class="text-left p-4 font-semibold">Test Name</th>
+                                        <th class="text-left p-4 font-semibold">Variants</th>
+                                        <th class="text-left p-4 font-semibold">Traffic Split</th>
+                                        <th class="text-left p-4 font-semibold">Confidence</th>
+                                        <th class="text-left p-4 font-semibold">Winner</th>
+                                        <th class="text-left p-4 font-semibold">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- @MAP: tests.map(test => ( -->
+                                    <tr class="border-b border-border" data-mock="true">
+                                        <td class="p-4">
+                                            <div>
+                                                <p class="font-medium">Holiday CTA Test</p>
+                                                <p class="text-muted-foreground text-sm">Testing button colors</p>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">2 variants</td>
+                                        <td class="p-4">50/50</td>
+                                        <td class="p-4">
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">95%</span>
+                                        </td>
+                                        <td class="p-4">Variant B</td>
+                                        <td class="p-4">
+                                            <button class="text-primary hover:text-primary/80 text-sm">View Results</button>
+                                        </td>
+                                    </tr>
+                                    <!-- @END_MAP )) -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Creative Performance Page -->
+
+                <!-- @COMPONENT: Conversion Tracking Page -->
+                <div id="conversion-page" class="page-content hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold mb-2">Conversion Tracking</h2>
+                        <p class="text-muted-foreground">Monitor your conversion funnel and attribution data</p>
+                    </div>
+
+                    <!-- Conversion Metrics -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Total Conversions</h3>
+                                <i data-lucide="target" class="w-5 h-5 text-green-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="conversions.total">18,426</p>
+                            <p class="text-muted-foreground text-sm">+15.3% vs last month</p>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Conversion Rate</h3>
+                                <i data-lucide="percent" class="w-5 h-5 text-blue-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="conversions.rate">4.8%</p>
+                            <p class="text-muted-foreground text-sm">+0.3% vs last month</p>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Avg. Order Value</h3>
+                                <i data-lucide="shopping-cart" class="w-5 h-5 text-purple-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="conversions.aov">$154.60</p>
+                            <p class="text-muted-foreground text-sm">+$12.40 vs last month</p>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-semibold">Cost Per Conversion</h3>
+                                <i data-lucide="dollar-sign" class="w-5 h-5 text-orange-600"></i>
+                            </div>
+                            <p class="text-3xl font-bold" data-bind="conversions.cost">$32.25</p>
+                            <p class="text-muted-foreground text-sm">-$2.10 vs last month</p>
+                        </div>
+                    </div>
+
+                    <!-- Conversion Funnel -->
+                    <div class="bg-card rounded-lg border border-border mb-8">
+                        <div class="p-6 border-b border-border">
+                            <h3 class="text-lg font-semibold">Conversion Funnel</h3>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="space-y-4">
+                                <!-- @MAP: funnelSteps.map(step => ( -->
+                                <div class="flex items-center space-x-4" data-mock="true">
+                                    <div class="w-4 h-4 bg-blue-600 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-medium">Ad Impressions</span>
+                                            <span class="font-mono">2,450,000</span>
+                                        </div>
+                                        <div class="w-full bg-muted rounded-full h-2">
+                                            <div class="bg-blue-600 h-2 rounded-full" style="width: 100%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-muted-foreground text-sm w-16 text-right">100%</span>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4" data-mock="true">
+                                    <div class="w-4 h-4 bg-green-600 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-medium">Website Visits</span>
+                                            <span class="font-mono">98,000</span>
+                                        </div>
+                                        <div class="w-full bg-muted rounded-full h-2">
+                                            <div class="bg-green-600 h-2 rounded-full" style="width: 40%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-muted-foreground text-sm w-16 text-right">4.0%</span>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4" data-mock="true">
+                                    <div class="w-4 h-4 bg-yellow-600 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-medium">Add to Cart</span>
+                                            <span class="font-mono">24,500</span>
+                                        </div>
+                                        <div class="w-full bg-muted rounded-full h-2">
+                                            <div class="bg-yellow-600 h-2 rounded-full" style="width: 25%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-muted-foreground text-sm w-16 text-right">25%</span>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4" data-mock="true">
+                                    <div class="w-4 h-4 bg-purple-600 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-medium">Checkout Started</span>
+                                            <span class="font-mono">14,700</span>
+                                        </div>
+                                        <div class="w-full bg-muted rounded-full h-2">
+                                            <div class="bg-purple-600 h-2 rounded-full" style="width: 60%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-muted-foreground text-sm w-16 text-right">60%</span>
+                                </div>
+                                
+                                <div class="flex items-center space-x-4" data-mock="true">
+                                    <div class="w-4 h-4 bg-red-600 rounded-full"></div>
+                                    <div class="flex-1">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="font-medium">Purchase Complete</span>
+                                            <span class="font-mono">9,420</span>
+                                        </div>
+                                        <div class="w-full bg-muted rounded-full h-2">
+                                            <div class="bg-red-600 h-2 rounded-full" style="width: 64%"></div>
+                                        </div>
+                                    </div>
+                                    <span class="text-muted-foreground text-sm w-16 text-right">64%</span>
+                                </div>
+                                <!-- @END_MAP )) -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Attribution Analysis -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-card rounded-lg border border-border">
+                            <div class="p-6 border-b border-border">
+                                <h3 class="text-lg font-semibold">Attribution Models</h3>
+                            </div>
+                            
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <!-- @MAP: attributionModels.map(model => ( -->
+                                    <div class="flex items-center justify-between" data-mock="true">
+                                        <span class="font-medium">First Touch</span>
+                                        <span class="font-mono">$847,392</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between" data-mock="true">
+                                        <span class="font-medium">Last Touch</span>
+                                        <span class="font-mono">$923,184</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between" data-mock="true">
+                                        <span class="font-medium">Linear</span>
+                                        <span class="font-mono">$885,288</span>
+                                    </div>
+                                    
+                                    <div class="flex items-center justify-between border-t border-border pt-4" data-mock="true">
+                                        <span class="font-semibold">Time Decay</span>
+                                        <span class="font-mono font-semibold">$901,456</span>
+                                    </div>
+                                    <!-- @END_MAP )) -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-card rounded-lg border border-border">
+                            <div class="p-6 border-b border-border">
+                                <h3 class="text-lg font-semibold">Top Converting Paths</h3>
+                            </div>
+                            
+                            <div class="p-6">
+                                <div class="space-y-4">
+                                    <!-- @MAP: convertingPaths.map(path => ( -->
+                                    <div class="border border-border rounded-lg p-4" data-mock="true">
+                                        <div class="flex items-center space-x-2 mb-2">
+                                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Google</span>
+                                            <i data-lucide="arrow-right" class="w-3 h-3 text-muted-foreground"></i>
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">Facebook</span>
+                                            <i data-lucide="arrow-right" class="w-3 h-3 text-muted-foreground"></i>
+                                            <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">Direct</span>
+                                        </div>
+                                        <div class="flex justify-between text-sm">
+                                            <span class="text-muted-foreground">Conversions:</span>
+                                            <span class="font-medium">2,847</span>
+                                        </div>
+                                    </div>
+                                    <!-- @END_MAP )) -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Conversion Tracking Page -->
+
+                <!-- @COMPONENT: Reports & Export Page -->
+                <div id="reports-page" class="page-content hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold mb-2">Reports & Export</h2>
+                        <p class="text-muted-foreground">Generate comprehensive reports and export your data</p>
+                    </div>
+
+                    <!-- Quick Reports -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="bar-chart-3" class="w-6 h-6 text-blue-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Campaign Performance</h3>
+                                    <p class="text-muted-foreground text-sm">Weekly summary</p>
+                                </div>
+                            </div>
+                            <button class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors text-sm" data-event="click:generateCampaignReport">
+                                Generate Report
+                            </button>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="users" class="w-6 h-6 text-green-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Audience Insights</h3>
+                                    <p class="text-muted-foreground text-sm">Demographics & behavior</p>
+                                </div>
+                            </div>
+                            <button class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors text-sm" data-event="click:generateAudienceReport">
+                                Generate Report
+                            </button>
+                        </div>
+                        
+                        <div class="bg-card p-6 rounded-lg border border-border">
+                            <div class="flex items-center space-x-3 mb-4">
+                                <div class="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <i data-lucide="target" class="w-6 h-6 text-purple-600"></i>
+                                </div>
+                                <div>
+                                    <h3 class="font-semibold">Conversion Analysis</h3>
+                                    <p class="text-muted-foreground text-sm">Funnel & attribution</p>
+                                </div>
+                            </div>
+                            <button class="w-full bg-primary text-primary-foreground py-2 px-4 rounded-lg hover:bg-primary/90 transition-colors text-sm" data-event="click:generateConversionReport">
+                                Generate Report
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Custom Report Builder -->
+                    <div class="bg-card rounded-lg border border-border mb-8">
+                        <div class="p-6 border-b border-border">
+                            <h3 class="text-lg font-semibold">Custom Report Builder</h3>
+                        </div>
+                        
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Report Name</label>
+                                    <input type="text" placeholder="Enter report name..." class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Date Range</label>
+                                    <select class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                        <option>Last 30 days</option>
+                                        <option>Last 7 days</option>
+                                        <option>This month</option>
+                                        <option>Custom range</option>
+                                    </select>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Metrics</label>
+                                    <div class="space-y-2">
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" class="rounded border-border" checked data-mock="true">
+                                            <span class="text-sm">Revenue & ROAS</span>
+                                        </label>
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" class="rounded border-border" checked data-mock="true">
+                                            <span class="text-sm">Conversion Metrics</span>
+                                        </label>
+                                        <label class="flex items-center space-x-2">
+                                            <input type="checkbox" class="rounded border-border" data-mock="true">
+                                            <span class="text-sm">Audience Demographics</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Grouping</label>
+                                    <select class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                        <option>By Campaign</option>
+                                        <option>By Channel</option>
+                                        <option>By Date</option>
+                                        <option>By Audience</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-4 mt-6">
+                                <button class="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors" data-event="click:generateCustomReport">
+                                    Generate Report
+                                </button>
+                                <button class="border border-input px-6 py-2 rounded-lg hover:bg-accent transition-colors" data-event="click:previewReport">
+                                    Preview
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Scheduled Reports -->
+                    <div class="bg-card rounded-lg border border-border">
+                        <div class="p-6 border-b border-border">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Scheduled Reports</h3>
+                                <button class="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm">
+                                    Schedule New
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-muted">
+                                    <tr>
+                                        <th class="text-left p-4 font-semibold">Report Name</th>
+                                        <th class="text-left p-4 font-semibold">Frequency</th>
+                                        <th class="text-left p-4 font-semibold">Recipients</th>
+                                        <th class="text-left p-4 font-semibold">Next Run</th>
+                                        <th class="text-left p-4 font-semibold">Status</th>
+                                        <th class="text-left p-4 font-semibold">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- @MAP: scheduledReports.map(report => ( -->
+                                    <tr class="border-b border-border" data-mock="true">
+                                        <td class="p-4">
+                                            <div>
+                                                <p class="font-medium">Weekly Performance Summary</p>
+                                                <p class="text-muted-foreground text-sm">Campaign metrics & KPIs</p>
+                                            </div>
+                                        </td>
+                                        <td class="p-4">Weekly</td>
+                                        <td class="p-4">marketing@company.com</td>
+                                        <td class="p-4">Monday, 9:00 AM</td>
+                                        <td class="p-4">
+                                            <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Active</span>
+                                        </td>
+                                        <td class="p-4">
+                                            <button class="p-1 hover:bg-accent rounded">
+                                                <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    <!-- @END_MAP )) -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Reports & Export Page -->
+
+                <!-- @COMPONENT: Settings Page -->
+                <div id="settings-page" class="page-content hidden">
+                    <div class="mb-6">
+                        <h2 class="text-2xl font-semibold mb-2">Settings</h2>
+                        <p class="text-muted-foreground">Configure your dashboard preferences and account settings</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                        <!-- Settings Navigation -->
+                        <div class="lg:col-span-1">
+                            <nav class="space-y-1">
+                                <a href="#general" class="settings-nav-item active" data-setting="general">
+                                    <i data-lucide="settings" class="w-4 h-4"></i>
+                                    <span>General</span>
+                                </a>
+                                <a href="#notifications" class="settings-nav-item" data-setting="notifications">
+                                    <i data-lucide="bell" class="w-4 h-4"></i>
+                                    <span>Notifications</span>
+                                </a>
+                                <a href="#integrations" class="settings-nav-item" data-setting="integrations">
+                                    <i data-lucide="link" class="w-4 h-4"></i>
+                                    <span>Integrations</span>
+                                </a>
+                                <a href="#team" class="settings-nav-item" data-setting="team">
+                                    <i data-lucide="users" class="w-4 h-4"></i>
+                                    <span>Team Management</span>
+                                </a>
+                                <a href="#billing" class="settings-nav-item" data-setting="billing">
+                                    <i data-lucide="credit-card" class="w-4 h-4"></i>
+                                    <span>Billing</span>
+                                </a>
+                            </nav>
+                        </div>
+
+                        <!-- Settings Content -->
+                        <div class="lg:col-span-3">
+                            <!-- General Settings -->
+                            <div id="general-settings" class="settings-content">
+                                <div class="bg-card rounded-lg border border-border p-6 mb-6">
+                                    <h3 class="text-lg font-semibold mb-4">Profile Information</h3>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">First Name</label>
+                                            <input type="text" value="John" class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">Last Name</label>
+                                            <input type="text" value="Smith" class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                        </div>
+                                        
+                                        <div class="md:col-span-2">
+                                            <label class="block text-sm font-medium mb-2">Email</label>
+                                            <input type="email" value="john.smith@company.com" class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-card rounded-lg border border-border p-6 mb-6">
+                                    <h3 class="text-lg font-semibold mb-4">Dashboard Preferences</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">Default Date Range</label>
+                                            <select class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                                <option>Last 30 days</option>
+                                                <option>Last 7 days</option>
+                                                <option>This month</option>
+                                                <option>This quarter</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">Currency</label>
+                                            <select class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                                <option>USD ($)</option>
+                                                <option>EUR (€)</option>
+                                                <option>GBP (£)</option>
+                                                <option>CAD (C$)</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-medium mb-2">Time Zone</label>
+                                            <select class="w-full p-3 border border-input rounded-lg bg-background" data-mock="true">
+                                                <option>Pacific Time (PT)</option>
+                                                <option>Eastern Time (ET)</option>
+                                                <option>Central Time (CT)</option>
+                                                <option>Mountain Time (MT)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <button class="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors" data-event="click:saveGeneralSettings">
+                                    Save Changes
+                                </button>
+                            </div>
+
+                            <!-- Notifications Settings -->
+                            <div id="notifications-settings" class="settings-content hidden">
+                                <div class="bg-card rounded-lg border border-border p-6 mb-6">
+                                    <h3 class="text-lg font-semibold mb-4">Email Notifications</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <label class="flex items-center justify-between">
+                                            <div>
+                                                <span class="font-medium">Campaign Alerts</span>
+                                                <p class="text-muted-foreground text-sm">Get notified when campaigns need attention</p>
+                                            </div>
+                                            <input type="checkbox" class="rounded border-border" checked data-mock="true">
+                                        </label>
+                                        
+                                        <label class="flex items-center justify-between">
+                                            <div>
+                                                <span class="font-medium">Weekly Reports</span>
+                                                <p class="text-muted-foreground text-sm">Receive weekly performance summaries</p>
+                                            </div>
+                                            <input type="checkbox" class="rounded border-border" checked data-mock="true">
+                                        </label>
+                                        
+                                        <label class="flex items-center justify-between">
+                                            <div>
+                                                <span class="font-medium">Budget Warnings</span>
+                                                <p class="text-muted-foreground text-sm">Alert when campaigns approach budget limits</p>
+                                            </div>
+                                            <input type="checkbox" class="rounded border-border" checked data-mock="true">
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <button class="bg-primary text-primary-foreground px-6 py-2 rounded-lg hover:bg-primary/90 transition-colors" data-event="click:saveNotificationSettings">
+                                    Save Changes
+                                </button>
+                            </div>
+
+                            <!-- Integrations Settings -->
+                            <div id="integrations-settings" class="settings-content hidden">
+                                <div class="bg-card rounded-lg border border-border p-6">
+                                    <h3 class="text-lg font-semibold mb-4">Connected Platforms</h3>
+                                    
+                                    <div class="space-y-4">
+                                        <!-- @MAP: integrations.map(integration => ( -->
+                                        <div class="flex items-center justify-between p-4 border border-border rounded-lg" data-mock="true">
+                                            <div class="flex items-center space-x-3">
+                                                <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                    <i data-lucide="chrome" class="w-5 h-5 text-blue-600"></i>
+                                                </div>
+                                                <div>
+                                                    <p class="font-medium">Google Ads</p>
+                                                    <p class="text-muted-foreground text-sm">Connected account: ads@company.com</p>
+                                                </div>
+                                            </div>
+                                            <div class="flex items-center space-x-2">
+                                                <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">Connected</span>
+                                                <button class="text-red-600 hover:text-red-700 text-sm">Disconnect</button>
+                                            </div>
+                                        </div>
+                                        <!-- @END_MAP )) -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Settings Page -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        (function() {
+            // Initialize Lucide icons
+            lucide.createIcons();
+
+            // Navigation functionality
+            const navItems = document.querySelectorAll('.nav-item');
+            const pageContents = document.querySelectorAll('.page-content');
+            const pageTitle = document.querySelector('[data-bind="pageTitle"]');
+
+            // Page titles mapping
+            const pageTitles = {
+                'overview': 'Overview Dashboard',
+                'campaigns': 'Campaign Management',
+                'audience': 'Audience Analytics',
+                'creative': 'Creative Performance',
+                'conversion': 'Conversion Tracking',
+                'reports': 'Reports & Export',
+                'settings': 'Settings'
+            };
+
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetPage = item.getAttribute('data-page');
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // Show target page content
+                    pageContents.forEach(page => page.classList.add('hidden'));
+                    document.getElementById(targetPage + '-page').classList.remove('hidden');
+                    
+                    // Update page title
+                    if (pageTitle) {
+                        pageTitle.textContent = pageTitles[targetPage] || 'Dashboard';
+                    }
+                });
+            });
+
+            // Settings navigation
+            const settingsNavItems = document.querySelectorAll('.settings-nav-item');
+            const settingsContents = document.querySelectorAll('.settings-content');
+
+            settingsNavItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetSetting = item.getAttribute('data-setting');
+                    
+                    // Update active settings nav item
+                    settingsNavItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // Show target settings content
+                    settingsContents.forEach(content => content.classList.add('hidden'));
+                    const targetContent = document.getElementById(targetSetting + '-settings');
+                    if (targetContent) {
+                        targetContent.classList.remove('hidden');
+                    }
+                });
+            });
+
+            // TODO: Implement business logic, API calls, or state management
+            // TODO: Add form validation and submission handlers
+            // TODO: Implement real-time data updates
+            // TODO: Add modal/dialog functionality for creating campaigns
+            // TODO: Implement chart rendering with Recharts
+            // TODO: Add export functionality for reports
+        })();
+    </script>
+
+    <style>
+        .nav-item {
+            @apply flex items-center space-x-3 p-3 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors cursor-pointer;
+        }
+        
+        .nav-item.active {
+            @apply text-foreground bg-accent;
+        }
+        
+        .settings-nav-item {
+            @apply flex items-center space-x-3 p-3 text-muted-foreground hover:text-foreground hover:bg-accent rounded-lg transition-colors cursor-pointer;
+        }
+        
+        .settings-nav-item.active {
+            @apply text-foreground bg-accent;
+        }
+        
+        .page-content {
+            @apply animate-in fade-in duration-200;
+        }
+        
+        @keyframes fade-in {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .animate-in {
+            animation-fill-mode: both;
+        }
+        
+        .fade-in {
+            animation-name: fade-in;
+        }
+        
+        .duration-200 {
+            animation-duration: 200ms;
+        }
+    </style>
+</body>
+</html>

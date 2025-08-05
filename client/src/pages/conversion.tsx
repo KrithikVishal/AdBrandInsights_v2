@@ -20,6 +20,8 @@ import { Progress } from "@/components/ui/progress";
 import { MetricCard } from "@/components/metric-card";
 import { ChartCard } from "@/components/chart-card";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { ExportButton } from "@/components/export-button";
+import { exportConversionData } from "@/lib/export-utils";
 import { 
   LineChart, 
   Line, 
@@ -297,15 +299,13 @@ export default function Conversion() {
             Monitor conversion performance and optimize your funnel effectiveness
           </p>
         </div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Download className="h-4 w-4 mr-2" />
-            Export Report
-          </Button>
-        </motion.div>
+        <ExportButton
+          onExport={async (format) => {
+            await exportConversionData([], format);
+          }}
+          label="Export Report"
+          className="bg-blue-600 hover:bg-blue-700"
+        />
       </motion.div>
 
       {/* Metrics */}

@@ -15,6 +15,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { CampaignCard } from "@/components/campaign-card";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
 import { ChartCard } from "@/components/chart-card";
+import { ExportButton } from "@/components/export-button";
+import { exportCampaignData } from "@/lib/export-utils";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { faker } from "@faker-js/faker";
 
@@ -233,15 +235,24 @@ export default function Campaigns() {
             Monitor and optimize your advertising campaigns across all platforms
           </p>
         </div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button onClick={() => setCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Campaign
-          </Button>
-        </motion.div>
+        <div className="flex space-x-3">
+          <ExportButton
+            onExport={async (format) => {
+              await exportCampaignData(filteredCampaigns || [], format);
+            }}
+            label="Export Campaigns"
+            variant="outline"
+          />
+          <motion.div
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <Button onClick={() => setCreateDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="h-4 w-4 mr-2" />
+              Create Campaign
+            </Button>
+          </motion.div>
+        </div>
       </motion.div>
 
       {/* Performance Timeline */}

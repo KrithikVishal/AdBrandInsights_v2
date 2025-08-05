@@ -11,7 +11,8 @@ import {
   Filter,
   Search,
   MoreHorizontal,
-  Download
+  Download,
+  X
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,6 +23,9 @@ import { Progress } from "@/components/ui/progress";
 import { MetricCard } from "@/components/metric-card";
 import { ChartCard } from "@/components/chart-card";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { ExportButton } from "@/components/export-button";
+import { exportCreativeData } from "@/lib/export-utils";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   BarChart, 
   Bar, 
@@ -84,6 +88,21 @@ function CreativeCard({ creative, index }: { creative: any, index: number }) {
   const Icon = typeIcons[creative.type as keyof typeof typeIcons];
   const ctr = ((creative.clicks / creative.impressions) * 100).toFixed(2);
   const conversionRate = ((creative.conversions / creative.clicks) * 100).toFixed(2);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDownload = () => {
+    // Create a download link for the creative asset
+    const link = document.createElement('a');
+    link.href = creative.thumbnail; // Using thumbnail as the asset URL
+    link.download = `${creative.name.replace(/\s+/g, '_')}.${creative.type === 'video' ? 'mp4' : 'jpg'}`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleView = () => {
+    setShowModal(true);
+  };
 
   return (
     <motion.div
@@ -176,15 +195,74 @@ function CreativeCard({ creative, index }: { creative: any, index: number }) {
 
           {/* Action Buttons */}
           <div className="flex space-x-2">
-            <Button size="sm" variant="outline" className="flex-1">
+            <Button size="sm" variant="outline" className="flex-1" onClick={handleView}>
               <Eye className="h-3 w-3 mr-1" />
               View
             </Button>
-            <Button size="sm" variant="outline" className="flex-1">
+            <Button size="sm" variant="outline" className="flex-1" onClick={handleDownload}>
               <Download className="h-3 w-3 mr-1" />
               Download
             </Button>
           </div>
+
+          {/* View Modal */}
+          <Dialog open={showModal} onOpenChange={setShowModal}>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle className="flex items-center justify-between">
+                  <span>{creative.name}</span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowModal(false)}
+                    className="h-8 w-8 p-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="relative">
+                  {creative.type === 'video' ? (
+                    <video
+                      controls
+                      className="w-full h-auto rounded-lg"
+                      poster={creative.thumbnail}
+                    >
+                      <source src={creative.thumbnail} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : (
+                    <img
+                      src={creative.thumbnail}
+                      alt={creative.name}
+                      className="w-full h-auto rounded-lg"
+                    />
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-gray-600">Type:</span> {creative.type}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Platform:</span> {creative.platform}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Impressions:</span> {creative.impressions.toLocaleString()}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Clicks:</span> {creative.clicks.toLocaleString()}
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">CTR:</span> {ctr}%
+                  </div>
+                  <div>
+                    <span className="font-medium text-gray-600">Engagement:</span> {creative.engagement}%
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </motion.div>
@@ -260,15 +338,13 @@ export default function Creative() {
             Analyze and optimize your creative assets across all campaigns
           </p>
         </div>
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Button className="bg-blue-600 hover:bg-blue-700">
-            <Download className="h-4 w-4 mr-2" />
-            Export Report
-          </Button>
-        </motion.div>
+        <ExportButton
+          onExport={async (format) => {
+            await exportCreativeData([], format);
+          }}
+          label="Export Report"
+          className="bg-blue-600 hover:bg-blue-700"
+        />
       </motion.div>
 
       {/* Metrics */}

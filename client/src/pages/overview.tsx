@@ -6,6 +6,8 @@ import { MetricCard } from "@/components/metric-card";
 import { ChartCard } from "@/components/chart-card";
 import { AIInsights } from "@/components/ai-insights";
 import { LoadingSkeleton } from "@/components/loading-skeleton";
+import { ExportButton } from "@/components/export-button";
+import { exportOverviewData } from "@/lib/export-utils";
 import { useEffect, useState } from "react";
 import { faker } from "@faker-js/faker";
 
@@ -144,13 +146,23 @@ export default function Overview() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
+        className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0"
       >
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-          Dashboard Overview
-        </h1>
-        <p className="text-gray-600 dark:text-gray-300">
-          Real-time analytics and AI-powered insights for your advertising campaigns
-        </p>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Dashboard Overview
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Real-time analytics and AI-powered insights for your advertising campaigns
+          </p>
+        </div>
+        <ExportButton
+          onExport={async (format) => {
+            await exportOverviewData(overview || {}, format);
+          }}
+          label="Export Data"
+          className="bg-blue-600 hover:bg-blue-700"
+        />
       </motion.div>
 
       {/* Metrics Grid */}
