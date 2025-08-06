@@ -7,9 +7,7 @@ import {
   Globe, 
   Shield, 
   User,
-  Monitor,
   Moon,
-  Sun,
   Smartphone,
   Mail,
   MessageSquare,
@@ -133,7 +131,6 @@ function ColorPicker({
 }
 
 export default function Settings() {
-  const { theme } = useTheme();
   const { showSuccess } = useToastManager();
 
   // Settings state
